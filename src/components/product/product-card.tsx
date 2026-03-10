@@ -6,7 +6,7 @@ import { Heart, Star } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { formatPrice } from '@/lib/utils'
-import { useCartStore } from '@/lib/store/cart'
+import { useCartStore, type CartStore } from '@/lib/store/cart'
 
 interface ProductCardProps {
   id: string
@@ -31,7 +31,7 @@ export function ProductCard({
   reviewCount = 0,
   inStock = true,
 }: ProductCardProps) {
-  const addItem = useCartStore((state) => state.addItem)
+  const addItem = useCartStore((state: CartStore) => state.addItem)
 
   const handleAddToCart = () => {
     addItem({

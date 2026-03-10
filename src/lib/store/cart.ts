@@ -11,7 +11,7 @@ export interface CartItem {
   variant?: string
 }
 
-interface CartStore {
+export interface CartStore {
   items: CartItem[]
   isOpen: boolean
   addItem: (item: CartItem) => void

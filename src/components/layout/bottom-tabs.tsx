@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, Search, ShoppingCart, Heart, User } from 'lucide-react'
-import { useCartStore } from '@/lib/store/cart'
+import { useCartStore, type CartStore } from '@/lib/store/cart'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -16,7 +16,7 @@ const navItems = [
 
 export function BottomTabs() {
   const pathname = usePathname()
-  const itemCount = useCartStore((state) => state.getItemCount())
+  const itemCount = useCartStore((state: CartStore) => state.getItemCount())
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-warm-white border-t border-beige md:hidden">

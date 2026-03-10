@@ -8,6 +8,10 @@ const nextConfig = {
       },
     ],
   },
+  // Ensure consistent build output for Vercel with route groups
+  generateBuildId: async () => {
+    return 'aura-home-build'
+  },
 }
 
 module.exports = nextConfig

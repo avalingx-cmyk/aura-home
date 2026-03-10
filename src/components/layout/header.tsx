@@ -3,11 +3,11 @@
 import Link from 'next/link'
 import { ShoppingCart, Menu, Search, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useCartStore } from '@/lib/store/cart'
+import { useCartStore, type CartStore } from '@/lib/store/cart'
 
 export function Header() {
-  const itemCount = useCartStore((state) => state.getItemCount())
-  const toggleCart = useCartStore((state) => state.toggleCart)
+  const itemCount = useCartStore((state: CartStore) => state.getItemCount())
+  const toggleCart = useCartStore((state: CartStore) => state.toggleCart)
 
   return (
     <header className="sticky top-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-beige">

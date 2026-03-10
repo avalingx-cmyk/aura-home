@@ -1,7 +1,7 @@
 'use client'
 
 import { X, Plus, Minus, ShoppingBag } from 'lucide-react'
-import { useCartStore } from '@/lib/store/cart'
+import { useCartStore, type CartItem } from '@/lib/store/cart'
 import { Button } from '@/components/ui/button'
 import { formatPrice } from '@/lib/utils'
 import Image from 'next/image'
@@ -43,7 +43,7 @@ export function CartDrawer() {
             </div>
           ) : (
             <div className="space-y-4">
-              {items.map((item) => (
+              {items.map((item: CartItem) => (
                 <div key={item.id} className="flex gap-4 bg-beige/50 rounded-2xl p-3">
                   <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-beige">
                     <Image src={item.image} alt={item.name} fill className="object-cover" />

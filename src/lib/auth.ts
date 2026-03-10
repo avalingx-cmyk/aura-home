@@ -1,4 +1,4 @@
-import { createClient } from './client'
+import { createClient } from './supabase/client'
 
 export async function signInWithMagicLink(email: string) {
   const supabase = createClient()

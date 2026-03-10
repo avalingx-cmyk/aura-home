@@ -1,49 +1,46 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       colors: {
-        // Primary - Natural Cozy
         forest: {
-          DEFAULT: '#2D5A3D',
-          light: '#3D7A4D',
-          dark: '#1D4A2D',
+          DEFAULT: "#2D5A3D",
+          dark: "#1E3D29",
+          light: "#4A7A5A",
         },
         sage: {
-          DEFAULT: '#8BAA8B',
-          light: '#ABCAAB',
+          DEFAULT: "#7D9A78",
+          dark: "#5A7A58",
+          light: "#A0BAA0",
         },
-        // Neutrals
-        cream: '#FDF8F3',
-        'warm-white': '#FFFEF9',
-        beige: {
-          DEFAULT: '#F5EFE6',
-          dark: '#E5DFD6',
+        cream: {
+          DEFAULT: "#FDF8F3",
+          dark: "#F5EDE5",
+          light: "#FFFCF9",
         },
         wood: {
-          DEFAULT: '#8B7355',
-          dark: '#5C4A3D',
+          DEFAULT: "#8B7355",
+          dark: "#6B5340",
+          light: "#A8947A",
+        },
+        beige: {
+          DEFAULT: "#E8DFD5",
+          dark: "#D4C7B8",
+          light: "#F2EBE3",
         },
       },
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-      },
-      borderRadius: {
-        '4xl': '2rem',
-      },
-      boxShadow: {
-        'soft': '0 2px 8px rgba(0,0,0,0.04)',
-        'medium': '0 4px 16px rgba(0,0,0,0.08)',
-        'large': '0 8px 32px rgba(0,0,0,0.12)',
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
     },
   },
   plugins: [],
-}
-export default config
+};
+
+export default config;

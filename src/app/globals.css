@@ -12,7 +12,8 @@
 }
 
 body {
-  @apply bg-cream antialiased;
+  background-color: var(--cream);
+  color: #1a1a1a;
 }
 
 * {

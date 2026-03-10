@@ -1,14 +1,19 @@
 'use client'
 
 import { X, Plus, Minus, ShoppingBag } from 'lucide-react'
-import { useCartStore, type CartItem } from '@/lib/store/cart'
+import { useCartStore, type CartStore, type CartItem } from '@/lib/store/cart'
 import { Button } from '@/components/ui/button'
 import { formatPrice } from '@/lib/utils'
 import Image from 'next/image'
 import Link from 'next/link'
 
 export function CartDrawer() {
-  const { items, isOpen, toggleCart, removeItem, updateQuantity, getTotal } = useCartStore()
+  const items = useCartStore((state: CartStore) => state.items)
+  const isOpen = useCartStore((state: CartStore) => state.isOpen)
+  const toggleCart = useCartStore((state: CartStore) => state.toggleCart)
+  const removeItem = useCartStore((state: CartStore) => state.removeItem)
+  const updateQuantity = useCartStore((state: CartStore) => state.updateQuantity)
+  const getTotal = useCartStore((state: CartStore) => state.getTotal)
 
   if (!isOpen) return null
 

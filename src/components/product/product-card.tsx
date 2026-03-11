@@ -13,7 +13,7 @@ interface ProductCardProps {
   name: string
   slug: string
   price: number
-  comparePrice?: number
+  comparePrice?: number | null
   image: string
   rating?: number
   reviewCount?: number

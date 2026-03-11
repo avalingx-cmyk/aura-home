@@ -6,21 +6,24 @@ export interface CartItem {
   productId: string
   name: string
   price: number
-  quantity: number
+  salePrice?: number
   image: string
-  variant?: string
+  quantity: number
+  stock: number
 }
 
-export interface CartStore {
+interface CartStore {
   items: CartItem[]
   isOpen: boolean
   addItem: (item: CartItem) => void
-  removeItem: (id: string) => void
-  updateQuantity: (id: string, quantity: number) => void
+  removeItem: (productId: string) => void
+  updateQuantity: (productId: string, quantity: number) => void
   clearCart: () => void
   toggleCart: () => void
-  getTotal: () => number
-  getItemCount: () => number
+  openCart: () => void
+  closeCart: () => void
+  getTotalItems: () => number
+  getTotalPrice: () => number
 }
 
 export const useCartStore = create<CartStore>()(
@@ -32,10 +35,11 @@ export const useCartStore = create<CartStore>()(
       addItem: (item) => set((state) => {
         const existing = state.items.find((i) => i.productId === item.productId)
         if (existing) {
+          const newQuantity = Math.min(existing.quantity + item.quantity, item.stock)
           return {
             items: state.items.map((i) =>
               i.productId === item.productId
-                ? { ...i, quantity: i.quantity + item.quantity }
+                ? { ...i, quantity: newQuantity }
                 : i
             ),
           }
@@ -43,23 +47,36 @@ export const useCartStore = create<CartStore>()(
         return { items: [...state.items, item] }
       }),
       
-      removeItem: (id) => set((state) => ({
-        items: state.items.filter((i) => i.id !== id),
+      removeItem: (productId) => set((state) => ({
+        items: state.items.filter((i) => i.productId !== productId),
       })),
       
-      updateQuantity: (id, quantity) => set((state) => ({
-        items: state.items.map((i) =>
-          i.id === id ? { ...i, quantity } : i
-        ),
-      })),
+      updateQuantity: (productId, quantity) => set((state) => {
+        const item = state.items.find((i) => i.productId === productId)
+        if (!item) return state
+        
+        const validQuantity = Math.max(1, Math.min(quantity, item.stock))
+        return {
+          items: state.items.map((i) =>
+            i.productId === productId ? { ...i, quantity: validQuantity } : i
+          ),
+        }
+      }),
       
       clearCart: () => set({ items: [] }),
       
       toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
       
-      getTotal: () => get().items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+      openCart: () => set({ isOpen: true }),
       
-      getItemCount: () => get().items.reduce((sum, item) => sum + item.quantity, 0),
+      closeCart: () => set({ isOpen: false }),
+      
+      getTotalItems: () => get().items.reduce((sum, item) => sum + item.quantity, 0),
+      
+      getTotalPrice: () => get().items.reduce((sum, item) => {
+        const price = item.salePrice || item.price
+        return sum + price * item.quantity
+      }, 0),
     }),
     {
       name: 'aura-cart',

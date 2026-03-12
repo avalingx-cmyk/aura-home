@@ -12,7 +12,8 @@ import { cn } from '@/lib/utils'
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, total, clearCart } = useCartStore()
+  const { items, clearCart } = useCartStore()
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const { shippingInfo, setShippingInfo, paymentMethod, setPaymentMethod, processOrder, isProcessing } = useCheckoutStore()
   const { addToast } = useToastStore()
   

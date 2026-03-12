@@ -33,10 +33,18 @@ export default function NewProductPage() {
       }
 
       addProduct(newProduct)
-      toast.success('Product created successfully')
+      addToast({
+        title: 'Success',
+        message: 'Product created successfully',
+        type: 'success',
+      })
       router.push('/admin/products')
     } catch (error) {
-      toast.error('Failed to create product')
+      addToast({
+        title: 'Error',
+        message: 'Failed to create product',
+        type: 'error',
+      })
     } finally {
       setIsSubmitting(false)
     }

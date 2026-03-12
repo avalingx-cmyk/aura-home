@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { CategoryForm } from '@/components/admin/CategoryForm'
 import { useAdminStore } from '@/lib/store/admin'
 import { Category } from '@/lib/data/mock-data'
-import { toast } from '@/lib/store/toast'
+import { useToastStore } from '@/lib/store/toast'
 
 export default function EditCategoryPage() {
   const router = useRouter()
@@ -33,10 +33,18 @@ export default function EditCategoryPage() {
     setIsSubmitting(true)
     try {
       updateCategory(categoryId, data)
-      toast.success('Category updated successfully')
+      addToast({
+        title: 'Success',
+        message: 'Category updated successfully',
+        type: 'success',
+      })
       router.push('/admin/categories')
     } catch (error) {
-      toast.error('Failed to update category')
+      addToast({
+        title: 'Error',
+        message: 'Failed to update category',
+        type: 'error',
+      })
     } finally {
       setIsSubmitting(false)
     }

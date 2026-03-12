@@ -49,6 +49,7 @@ export default function CheckoutPage() {
       const orderId = await processOrder()
       if (orderId) {
         addToast({
+          title: 'Success',
           message: 'Order placed successfully!',
           type: 'success',
         })
@@ -56,6 +57,7 @@ export default function CheckoutPage() {
       }
     } catch (error) {
       addToast({
+        title: 'Error',
         message: 'Failed to place order. Please try again.',
         type: 'error',
       })

@@ -52,7 +52,6 @@ function ProductCard({ product }: { product: Product }) {
   return (
     <Link href={`/products/${product.slug}`} className="group">
       <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-        {/* Image */}
         <div className="relative aspect-square bg-gray-100">
           {product.images?.[0] ? (
             <Image
@@ -66,28 +65,21 @@ function ProductCard({ product }: { product: Product }) {
               No image
             </div>
           )}
-          
-          {/* Discount badge */}
           {hasDiscount && (
             <span className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
               -{discountPercent}%
             </span>
           )}
-          
-          {/* Out of stock */}
           {product.inStock === false && (
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
               <span className="text-white font-medium">Out of Stock</span>
             </div>
           )}
         </div>
-
-        {/* Details */}
         <div className="p-4">
           <h3 className="font-medium text-gray-900 group-hover:text-green-600 transition-colors line-clamp-2">
             {product.name}
           </h3>
-          
           <div className="mt-2 flex items-center gap-2">
             <span className="text-lg font-bold text-gray-900">
               Rs. {product.price.toLocaleString()}

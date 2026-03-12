@@ -31,6 +31,17 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   }
 }
 
+/**
+ * Render the category page for the provided category slug.
+ *
+ * Fetches the category and its products, renders the header, product grid, and a grid of other categories.
+ *
+ * @param params - A promise resolving to an object with a `slug` string identifying the category
+ * @returns The page's JSX element containing the category header, product list, and other categories
+ *
+ * @remarks
+ * If the category for the provided slug does not exist, a 404 page is triggered.
+ */
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params
   const category = getCategoryBySlug(slug)

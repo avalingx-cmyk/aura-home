@@ -104,7 +104,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
               >
                 <div className="relative h-32 rounded-2xl overflow-hidden">
                   <Image
-                    src={cat.image_url}
+                    src={cat.image_url || 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&auto=format&fit=crop&q=60'}
                     alt={cat.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"

@@ -32,7 +32,7 @@ export default function CategoriesPage() {
             >
               <div className="relative h-64">
                 <Image
-                  src={category.image_url}
+                  src={category.image_url || 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&auto=format&fit=crop&q=60'}
                   alt={category.name}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"

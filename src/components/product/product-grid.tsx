@@ -42,11 +42,12 @@ export function ProductGrid({ products, emptyMessage = 'No products found' }: Pr
           name={product.name}
           slug={product.slug}
           price={product.price}
-          comparePrice={product.sale_price}
+          comparePrice={product.comparePrice}
           image={product.images[0] || '/placeholder-product.jpg'}
-          rating={product.rating}
-          reviewCount={product.review_count}
-          inStock={product.stock > 0}
+          rating={4.5}
+          reviewCount={0}
+          inStock={product.inStock !== false}
+          stock={product.stock ?? 10}
         />
       ))}
     </div>

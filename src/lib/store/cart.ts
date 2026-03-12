@@ -83,3 +83,12 @@ export const useCartStore = create<CartStore>()(
     }
   )
 )
+
+export function useCart() {
+  const store = useCartStore()
+  return {
+    ...store,
+    total: store.getTotalPrice(),
+    itemCount: store.getTotalItems(),
+  }
+}

@@ -26,25 +26,17 @@ export default function NewProductPage() {
         description: data.description || '',
         price: data.price || 0,
         comparePrice: data.comparePrice,
-        stock: data.stock || 0,
+        inStock: true,
         categoryId: data.categoryId || '',
         images: data.images || [],
         featured: data.featured || false,
       }
 
       addProduct(newProduct)
-      addToast({
-        title: 'Success',
-        message: 'Product created successfully',
-        type: 'success',
-      })
+      toast.success('Product created successfully')
       router.push('/admin/products')
     } catch (error) {
-      addToast({
-        title: 'Error',
-        message: 'Failed to create product',
-        type: 'error',
-      })
+      toast.error('Failed to create product')
     } finally {
       setIsSubmitting(false)
     }

@@ -17,6 +17,8 @@ export function Toast() {
   )
 }
 
+export const ToastContainer = Toast
+
 interface ToastItemProps {
   toast: {
     id: string

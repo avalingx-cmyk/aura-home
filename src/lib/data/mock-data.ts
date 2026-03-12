@@ -18,6 +18,7 @@ export interface Product {
   images: string[]
   categoryId: string
   category?: string
+  stock?: number
   inStock?: boolean
   featured?: boolean
 }
@@ -122,7 +123,7 @@ export function getFeaturedProducts(): Product[] {
 }
 
 // Helper to get product image with fallback
-export function getProductImage(product: Product | undefined): string {
+export function getProductImage(product: { images?: string[] } | undefined): string {
   return product?.images?.[0] || PLACEHOLDER_IMAGE
 }
 

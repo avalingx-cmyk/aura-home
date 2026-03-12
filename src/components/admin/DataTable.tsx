@@ -21,7 +21,7 @@ interface DataTableProps<T> {
 
 type SortDirection = 'asc' | 'desc' | null
 
-export function DataTable<T extends Record<string, unknown>>({
+export function DataTable<T extends object>({
   data,
   columns,
   onEdit,
@@ -48,8 +48,8 @@ export function DataTable<T extends Record<string, unknown>>({
   const sortedData = [...data].sort((a, b) => {
     if (!sortKey || !sortDirection) return 0
 
-    const aValue = a[sortKey]
-    const bValue = b[sortKey]
+    const aValue = (a as Record<string, unknown>)[sortKey]
+    const bValue = (b as Record<string, unknown>)[sortKey]
 
     if (aValue === undefined || bValue === undefined) return 0
 
@@ -116,12 +116,12 @@ export function DataTable<T extends Record<string, unknown>>({
           <tbody className="divide-y divide-beige-dark">
             {sortedData.map((item) => (
               <tr
-                key={String(item[keyField])}
+                key={String((item as Record<string, unknown>)[keyField as string])}
                 className="hover:bg-beige/20 transition-colors"
               >
                 {columns.map((column) => (
                   <td key={column.key} className="px-4 py-3 text-sm text-wood-dark">
-                    {column.render ? column.render(item) : String(item[column.key] ?? '')}
+                    {column.render ? column.render(item) : String((item as Record<string, unknown>)[column.key] ?? '')}
                   </td>
                 ))}
                 {(onEdit || onDelete) && (

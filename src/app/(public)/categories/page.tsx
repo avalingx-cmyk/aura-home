@@ -9,12 +9,12 @@ export const metadata: Metadata = {
 }
 
 /**
- * Renders the Categories page displaying a header and a responsive grid of category tiles.
+ * Render the categories page with a hero header and a responsive grid of category cards.
  *
- * Each tile links to its category page, shows a category image (with a fallback when missing),
- * the category name, and a short description.
+ * Each card links to its category detail page and displays the category name, description,
+ * and an image (uses `category.image_url` or a fixed Unsplash fallback when missing).
  *
- * @returns A React element representing the Categories page.
+ * @returns A JSX element containing the page header and a responsive grid of linked category cards.
  */
 export default function CategoriesPage() {
   return (

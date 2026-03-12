@@ -37,9 +37,9 @@ export default function CategoriesPage() {
       render: (category) => (
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-lg bg-sage/30 flex items-center justify-center overflow-hidden">
-            {category.image ? (
+            {category.image_url ? (
               <img
-                src={category.image}
+                src={category.image_url}
                 alt={category.name}
                 className="h-full w-full object-cover"
               />

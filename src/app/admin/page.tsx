@@ -108,9 +108,9 @@ export default function AdminDashboard() {
                   className="flex items-center gap-3 p-3 rounded-xl bg-beige/30"
                 >
                   <div className="h-12 w-12 rounded-lg bg-sage/30 flex items-center justify-center overflow-hidden">
-                    {category.image ? (
+                    {category.image_url ? (
                       <img
-                        src={category.image}
+                        src={category.image_url}
                         alt={category.name}
                         className="h-full w-full object-cover"
                       />

@@ -11,7 +11,7 @@ interface CategoryFormData {
   name: string
   slug: string
   description: string
-  image: string
+  image_url: string
 }
 
 interface CategoryFormProps {
@@ -36,7 +36,7 @@ export function CategoryForm({
       name: category?.name ?? '',
       slug: category?.slug ?? '',
       description: category?.description ?? '',
-      image: category?.image ?? '',
+      image_url: category?.image_url ?? '',
     },
   })
 
@@ -87,7 +87,7 @@ export function CategoryForm({
       <Input
         label="Image URL"
         placeholder="https://example.com/category-image.jpg"
-        {...register('image')}
+        {...register('image_url')}
       />
 
       {/* Actions */}

@@ -22,6 +22,9 @@ export interface Product {
   featured?: boolean
 }
 
+// Placeholder image for products without images
+const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&auto=format&fit=crop&q=60'
+
 export const categories: Category[] = [
   { id: '1', name: 'Living Room', slug: 'living-room', description: 'Sofas, tables, and more' },
   { id: '2', name: 'Bedroom', slug: 'bedroom', description: 'Beds, wardrobes, and bedroom furniture' },
@@ -31,11 +34,11 @@ export const categories: Category[] = [
 ]
 
 export const products: Product[] = [
-  { id: '1', name: 'Modern 3-Seater Sofa', slug: 'modern-3-seater-sofa', price: 85000, comparePrice: 95000, images: [], category: 'living-room', inStock: true, featured: true },
-  { id: '2', name: 'King Size Bed Frame', slug: 'king-size-bed-frame', price: 120000, images: [], category: 'bedroom', inStock: true, featured: true },
-  { id: '3', name: 'Dining Table Set', slug: 'dining-table-set', price: 145000, images: [], category: 'dining', inStock: true },
-  { id: '4', name: 'Executive Office Chair', slug: 'executive-office-chair', price: 35000, images: [], category: 'office', inStock: true },
-  { id: '5', name: 'Garden Lounge Set', slug: 'garden-lounge-set', price: 95000, images: [], category: 'outdoor', inStock: false }
+  { id: '1', name: 'Modern 3-Seater Sofa', slug: 'modern-3-seater-sofa', price: 85000, comparePrice: 95000, images: [PLACEHOLDER_IMAGE], category: 'living-room', inStock: true, featured: true },
+  { id: '2', name: 'King Size Bed Frame', slug: 'king-size-bed-frame', price: 120000, images: [PLACEHOLDER_IMAGE], category: 'bedroom', inStock: true, featured: true },
+  { id: '3', name: 'Dining Table Set', slug: 'dining-table-set', price: 145000, images: [PLACEHOLDER_IMAGE], category: 'dining', inStock: true },
+  { id: '4', name: 'Executive Office Chair', slug: 'executive-office-chair', price: 35000, images: [PLACEHOLDER_IMAGE], category: 'office', inStock: true },
+  { id: '5', name: 'Garden Lounge Set', slug: 'garden-lounge-set', price: 95000, images: [PLACEHOLDER_IMAGE], category: 'outdoor', inStock: false }
 ]
 
 export function getCategoryBySlug(slug: string): Category | undefined {
@@ -52,4 +55,9 @@ export function getProductBySlug(slug: string): Product | undefined {
 
 export function getFeaturedProducts(): Product[] {
   return products.filter(p => p.featured)
+}
+
+// Helper to get product image with fallback
+export function getProductImage(product: Product | undefined): string {
+  return product?.images?.[0] || PLACEHOLDER_IMAGE
 }

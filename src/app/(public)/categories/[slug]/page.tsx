@@ -46,7 +46,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       {/* Category Header */}
       <section className="relative h-64 lg:h-80">
         <Image
-          src={category.image_url}
+          src={category.image_url || 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&auto=format&fit=crop&q=60'}
           alt={category.name}
           fill
           className="object-cover"

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { getProductImage } from '@/lib/data/mock-data'
 
 export interface Product {
   id: string
@@ -49,45 +50,33 @@ function ProductCard({ product }: { product: Product }) {
     ? Math.round(((product.comparePrice! - product.price) / product.comparePrice!) * 100)
     : 0
 
+  const imageUrl = getProductImage(product)
+
   return (
     <Link href={`/products/${product.slug}`} className="group">
       <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-        {/* Image */}
         <div className="relative aspect-square bg-gray-100">
-          {product.images?.[0] ? (
-            <Image
-              src={product.images[0]}
-              alt={product.name}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-          ) : (
-            <div className="flex items-center justify-center h-full text-gray-400">
-              No image
-            </div>
-          )}
-          
-          {/* Discount badge */}
+          <Image
+            src={imageUrl}
+            alt={product.name}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+          />
           {hasDiscount && (
             <span className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
               -{discountPercent}%
             </span>
           )}
-          
-          {/* Out of stock */}
           {product.inStock === false && (
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
               <span className="text-white font-medium">Out of Stock</span>
             </div>
           )}
         </div>
-
-        {/* Details */}
         <div className="p-4">
           <h3 className="font-medium text-gray-900 group-hover:text-green-600 transition-colors line-clamp-2">
             {product.name}
           </h3>
-          
           <div className="mt-2 flex items-center gap-2">
             <span className="text-lg font-bold text-gray-900">
               Rs. {product.price.toLocaleString()}

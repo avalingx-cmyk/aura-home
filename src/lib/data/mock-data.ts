@@ -5,7 +5,7 @@ export interface Category {
   name: string
   slug: string
   description?: string
-  image?: string
+  image_url?: string
 }
 
 export interface Product {
@@ -25,12 +25,15 @@ export interface Product {
 // Placeholder image for products without images
 const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&auto=format&fit=crop&q=60'
 
+// Placeholder for category images
+const CATEGORY_PLACEHOLDER = 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&auto=format&fit=crop&q=60'
+
 export const categories: Category[] = [
-  { id: '1', name: 'Living Room', slug: 'living-room', description: 'Sofas, tables, and more for your living space' },
-  { id: '2', name: 'Bedroom', slug: 'bedroom', description: 'Beds, wardrobes, and bedroom furniture' },
-  { id: '3', name: 'Dining', slug: 'dining', description: 'Dining tables, chairs, and sets' },
-  { id: '4', name: 'Office', slug: 'office', description: 'Desks, chairs, and office furniture' },
-  { id: '5', name: 'Outdoor', slug: 'outdoor', description: 'Patio and garden furniture' }
+  { id: '1', name: 'Living Room', slug: 'living-room', description: 'Sofas, tables, and more for your living space', image_url: CATEGORY_PLACEHOLDER },
+  { id: '2', name: 'Bedroom', slug: 'bedroom', description: 'Beds, wardrobes, and bedroom furniture', image_url: CATEGORY_PLACEHOLDER },
+  { id: '3', name: 'Dining', slug: 'dining', description: 'Dining tables, chairs, and sets', image_url: CATEGORY_PLACEHOLDER },
+  { id: '4', name: 'Office', slug: 'office', description: 'Desks, chairs, and office furniture', image_url: CATEGORY_PLACEHOLDER },
+  { id: '5', name: 'Outdoor', slug: 'outdoor', description: 'Patio and garden furniture', image_url: CATEGORY_PLACEHOLDER }
 ]
 
 export const products: Product[] = [
@@ -121,6 +124,11 @@ export function getFeaturedProducts(): Product[] {
 // Helper to get product image with fallback
 export function getProductImage(product: Product | undefined): string {
   return product?.images?.[0] || PLACEHOLDER_IMAGE
+}
+
+// Helper to get category image with fallback
+export function getCategoryImage(category: Category | undefined): string {
+  return category?.image_url || CATEGORY_PLACEHOLDER
 }
 
 // Helper to search products safely

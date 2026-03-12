@@ -24,7 +24,7 @@ export default function NewCategoryPage() {
         name: data.name || '',
         slug: data.slug || '',
         description: data.description || '',
-        image: data.image || '',
+        image_url: data.image_url || '',
       }
 
       addCategory(newCategory)

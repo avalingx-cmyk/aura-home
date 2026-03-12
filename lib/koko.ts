@@ -1,21 +1,12 @@
 // Koko Payment Integration for Sri Lanka
-// https://koko.lk/developers
 
 interface KokoPaymentRequest {
   amount: number
   currency?: string
   merchantReference: string
   returnUrl: string
-  customer: {
-    name: string
-    phone: string
-    email?: string
-  }
-  items?: {
-    name: string
-    quantity: number
-    price: number
-  }[]
+  customer: { name: string; phone: string; email?: string }
+  items?: { name: string; quantity: number; price: number }[]
 }
 
 interface KokoPaymentResponse {
@@ -35,7 +26,6 @@ export async function createKokoPayment(orderData: KokoPaymentRequest): Promise<
   if (!KOKO_MERCHANT_ID || !KOKO_API_KEY) {
     return { success: false, error: 'Koko not configured' }
   }
-
   try {
     const response = await fetch(`${KOKO_BASE_URL}/payments`, {
       method: 'POST',
@@ -54,17 +44,10 @@ export async function createKokoPayment(orderData: KokoPaymentRequest): Promise<
         installment_plans: [3]
       })
     })
-
     const data = await response.json()
-
     if (response.ok && data.payment_url) {
-      return {
-        success: true,
-        paymentUrl: data.payment_url,
-        transactionId: data.transaction_id
-      }
+      return { success: true, paymentUrl: data.payment_url, transactionId: data.transaction_id }
     }
-
     return { success: false, error: data.message || 'Payment creation failed' }
   } catch (error: any) {
     return { success: false, error: error.message }
@@ -75,12 +58,8 @@ export async function verifyKokoPayment(transactionId: string, signature: string
   try {
     const response = await fetch(`${KOKO_BASE_URL}/payments/${transactionId}/verify`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${KOKO_API_KEY}`,
-        'X-Signature': signature
-      }
+      headers: { 'Authorization': `Bearer ${KOKO_API_KEY}`, 'X-Signature': signature }
     })
-
     const data = await response.json()
     return { verified: response.ok && data.status === 'paid', data }
   } catch {
@@ -92,15 +71,9 @@ export function calculateInstallments(total: number, months: number = 3): number
   const installment = Math.ceil(total / months)
   const installments: number[] = []
   let remaining = total
-
   for (let i = 0; i < months; i++) {
-    if (i === months - 1) {
-      installments.push(remaining)
-    } else {
-      installments.push(installment)
-      remaining -= installment
-    }
+    if (i === months - 1) installments.push(remaining)
+    else { installments.push(installment); remaining -= installment }
   }
-
   return installments
 }

@@ -10,4 +10,4 @@ export function createServerClient() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
-}
+}// Updated Thu Mar 12 19:44:03 CET 2026

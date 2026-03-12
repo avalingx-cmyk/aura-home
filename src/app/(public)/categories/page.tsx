@@ -8,6 +8,14 @@ export const metadata: Metadata = {
   description: 'Browse our furniture categories - Living Room, Bedroom, Dining, Office, and more.',
 }
 
+/**
+ * Render the categories page with a hero header and a responsive grid of category cards.
+ *
+ * Each card links to its category detail page and displays the category name, description,
+ * and an image (uses `category.image_url` or a fixed Unsplash fallback when missing).
+ *
+ * @returns A JSX element containing the page header and a responsive grid of linked category cards.
+ */
 export default function CategoriesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-warm-white via-beige/30 to-sage/20">

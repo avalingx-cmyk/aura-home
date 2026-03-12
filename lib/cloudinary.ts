@@ -1,4 +1,4 @@
-import { v2 as cloudinary, UploadApiResponse, UploadApiErrorResponse } from 'cloudinary'
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary'
 
 // Configure Cloudinary
 cloudinary.config({
@@ -23,7 +23,6 @@ export async function uploadImage(
   folder: string = 'aura-home/products'
 ): Promise<UploadResult> {
   try {
-    // Ensure proper data URI format
     const dataUri = base64Image.startsWith('data:') 
       ? base64Image 
       : `data:image/jpeg;base64,${base64Image}`
@@ -34,9 +33,7 @@ export async function uploadImage(
       transformation: [
         { quality: 'auto:good' },
         { fetch_format: 'auto' }
-      ],
-      overwrite: false,
-      unique_filename: true
+      ]
     }) as UploadApiResponse
 
     return {
@@ -59,10 +56,7 @@ export async function uploadImages(
   images: string[],
   folder: string = 'aura-home/products'
 ): Promise<UploadResult[]> {
-  const results = await Promise.all(
-    images.map(image => uploadImage(image, folder))
-  )
-  return results
+  return Promise.all(images.map(img => uploadImage(img, folder)))
 }
 
 /**
@@ -72,19 +66,15 @@ export async function deleteImage(publicId: string): Promise<boolean> {
   try {
     await cloudinary.uploader.destroy(publicId)
     return true
-  } catch (error) {
+  } catch {
     return false
   }
 }
 
 /**
- * Get optimized URL for image
+ * Get optimized URL
  */
-export function getOptimizedUrl(
-  publicId: string,
-  width?: number,
-  height?: number
-): string {
+export function getOptimizedUrl(publicId: string, width?: number, height?: number): string {
   return cloudinary.url(publicId, {
     secure: true,
     transformation: [
@@ -98,7 +88,7 @@ export function getOptimizedUrl(
 }
 
 /**
- * Generate thumbnail URL
+ * Get thumbnail URL
  */
 export function getThumbnailUrl(publicId: string, size: number = 200): string {
   return getOptimizedUrl(publicId, size, size)

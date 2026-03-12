@@ -8,6 +8,14 @@ export const metadata: Metadata = {
   description: 'Browse our furniture categories - Living Room, Bedroom, Dining, Office, and more.',
 }
 
+/**
+ * Renders the Categories page displaying a header and a responsive grid of category tiles.
+ *
+ * Each tile links to its category page, shows a category image (with a fallback when missing),
+ * the category name, and a short description.
+ *
+ * @returns A React element representing the Categories page.
+ */
 export default function CategoriesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-warm-white via-beige/30 to-sage/20">

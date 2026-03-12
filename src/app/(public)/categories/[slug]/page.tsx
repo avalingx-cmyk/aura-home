@@ -31,6 +31,14 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   }
 }
 
+/**
+ * Render the category page for a given category slug.
+ *
+ * If no category matches the provided slug, triggers a 404 by calling `notFound()`.
+ *
+ * @param params - An object with a `slug` string identifying the category to display.
+ * @returns The JSX element for the category page, including the header, product list, and other categories grid.
+ */
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params
   const category = getCategoryBySlug(slug)

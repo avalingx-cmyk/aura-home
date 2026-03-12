@@ -31,6 +31,14 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   }
 }
 
+/**
+ * Renders the category page for a given category slug.
+ *
+ * If the category does not exist, triggers a 404 response via `notFound()`.
+ *
+ * @param params - An object containing `slug`, the category identifier used to load the page
+ * @returns A React element rendering the category page for the provided slug
+ */
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params
   const category = getCategoryBySlug(slug)
@@ -46,7 +54,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       {/* Category Header */}
       <section className="relative h-64 lg:h-80">
         <Image
-          src={category.image_url}
+          src={category.image_url || 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&auto=format&fit=crop&q=60'}
           alt={category.name}
           fill
           className="object-cover"

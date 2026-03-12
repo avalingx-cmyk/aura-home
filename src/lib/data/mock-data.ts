@@ -16,7 +16,7 @@ export interface Product {
   price: number
   comparePrice?: number
   images: string[]
-  categoryId?: string
+  categoryId: string
   category?: string
   inStock?: boolean
   featured?: boolean
@@ -41,7 +41,8 @@ export const products: Product[] = [
     description: 'Comfortable modern sofa with premium fabric upholstery, perfect for contemporary living rooms.',
     price: 85000, 
     comparePrice: 95000, 
-    images: [PLACEHOLDER_IMAGE], 
+    images: [PLACEHOLDER_IMAGE],
+    categoryId: '1',
     category: 'living-room', 
     inStock: true, 
     featured: true 
@@ -52,7 +53,8 @@ export const products: Product[] = [
     slug: 'king-size-bed-frame', 
     description: 'Elegant solid wood king size bed frame with headboard, built to last.',
     price: 120000, 
-    images: [PLACEHOLDER_IMAGE], 
+    images: [PLACEHOLDER_IMAGE],
+    categoryId: '2',
     category: 'bedroom', 
     inStock: true, 
     featured: true 
@@ -63,7 +65,8 @@ export const products: Product[] = [
     slug: 'dining-table-set', 
     description: 'Solid wood dining table with 6 matching chairs, seats up to 8 people.',
     price: 145000, 
-    images: [PLACEHOLDER_IMAGE], 
+    images: [PLACEHOLDER_IMAGE],
+    categoryId: '3',
     category: 'dining', 
     inStock: true 
   },
@@ -73,7 +76,8 @@ export const products: Product[] = [
     slug: 'executive-office-chair', 
     description: 'Ergonomic office chair with lumbar support, adjustable height, and breathable mesh back.',
     price: 35000, 
-    images: [PLACEHOLDER_IMAGE], 
+    images: [PLACEHOLDER_IMAGE],
+    categoryId: '4',
     category: 'office', 
     inStock: true 
   },
@@ -83,7 +87,8 @@ export const products: Product[] = [
     slug: 'garden-lounge-set', 
     description: 'Weather-resistant outdoor furniture set with cushions, includes 2 sofas and coffee table.',
     price: 95000, 
-    images: [PLACEHOLDER_IMAGE], 
+    images: [PLACEHOLDER_IMAGE],
+    categoryId: '5',
     category: 'outdoor', 
     inStock: false 
   }
@@ -93,8 +98,16 @@ export function getCategoryBySlug(slug: string): Category | undefined {
   return categories.find(c => c.slug === slug)
 }
 
+export function getCategoryById(id: string): Category | undefined {
+  return categories.find(c => c.id === id)
+}
+
 export function getProductsByCategory(categorySlug: string): Product[] {
   return products.filter(p => p.category === categorySlug)
+}
+
+export function getProductsByCategoryId(categoryId: string): Product[] {
+  return products.filter(p => p.categoryId === categoryId)
 }
 
 export function getProductBySlug(slug: string): Product | undefined {

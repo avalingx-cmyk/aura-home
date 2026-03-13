@@ -1,17 +1,13 @@
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import { ProductDetail } from '@/components/product'
-import { getProductBySlug, products } from '@/lib/data/mock-data'
+import { getProductBySlug } from '@/lib/data/mock-data'
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>
 }
 
-export async function generateStaticParams() {
-  return products.map((product) => ({
-    slug: product.slug,
-  }))
-}
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params

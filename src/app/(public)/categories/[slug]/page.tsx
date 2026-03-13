@@ -9,11 +9,7 @@ interface CategoryPageProps {
   params: Promise<{ slug: string }>
 }
 
-export async function generateStaticParams() {
-  return categories.map((category) => ({
-    slug: category.slug,
-  }))
-}
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params

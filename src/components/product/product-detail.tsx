@@ -2,7 +2,8 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
-import { getProductImage } from '@/lib/data/mock-data'
+
+const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&auto=format&fit=crop&q=60'
 
 export interface ProductDetailProps {
   product: {
@@ -22,7 +23,7 @@ export interface ProductDetailProps {
 export function ProductDetail({ product, onAddToCart }: ProductDetailProps) {
   const [selectedImage, setSelectedImage] = useState(0)
   
-  const imageUrl = product.images?.[selectedImage] || getProductImage(product)
+  const imageUrl = product.images?.[selectedImage] || PLACEHOLDER_IMAGE
   const hasDiscount = product.comparePrice && product.comparePrice > product.price
   const discountPercent = hasDiscount
     ? Math.round(((product.comparePrice! - product.price) / product.comparePrice!) * 100)
@@ -59,7 +60,7 @@ export function ProductDetail({ product, onAddToCart }: ProductDetailProps) {
                 }`}
               >
                 <Image
-                  src={img || getProductImage(undefined)}
+                  src={img || PLACEHOLDER_IMAGE}
                   alt={`${product.name} ${idx + 1}`}
                   fill
                   className="object-cover"

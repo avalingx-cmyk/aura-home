@@ -5,31 +5,30 @@ import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CategoryForm } from '@/components/admin/CategoryForm'
 import { useAdminStore } from '@/lib/store/admin'
-import { Category } from '@/lib/data/mock-data'
 import { toast } from '@/lib/store/toast'
 import { useState } from 'react'
 
 export default function NewCategoryPage() {
   const router = useRouter()
-  const { categories, addCategory } = useAdminStore()
+  const { addCategory } = useAdminStore()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = async (data: Partial<Category>) => {
+  const handleSubmit = async (data: any) => {
     setIsSubmitting(true)
     try {
-      // Generate a unique ID
-      const maxId = Math.max(...categories.map((c) => parseInt(c.id) || 0), 0)
-      const newCategory: Category = {
-        id: String(maxId + 1),
-        name: data.name || '',
-        slug: data.slug || '',
-        description: data.description || '',
-        image_url: data.image_url || '',
-      }
+      const category = await addCategory({
+        name: data.name,
+        slug: data.slug,
+        description: data.description,
+        image_url: data.image_url,
+      })
 
-      addCategory(newCategory)
-      toast.success('Category created successfully')
-      router.push('/admin/categories')
+      if (category) {
+        toast.success('Category created successfully')
+        router.push('/admin/categories')
+      } else {
+        toast.error('Failed to create category')
+      }
     } catch (error) {
       toast.error('Failed to create category')
     } finally {
@@ -39,7 +38,6 @@ export default function NewCategoryPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex items-center gap-4">
         <Button
           variant="secondary"
@@ -54,7 +52,6 @@ export default function NewCategoryPage() {
         </div>
       </div>
 
-      {/* Form Card */}
       <div className="rounded-2xl bg-warm-white border border-beige-dark p-6 shadow-sm">
         <CategoryForm
           onSubmit={handleSubmit}

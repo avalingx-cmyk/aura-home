@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form'
 import { FolderTree } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Category } from '@/lib/data/mock-data'
 import { cn } from '@/lib/utils'
 
 interface CategoryFormData {
@@ -15,8 +14,14 @@ interface CategoryFormData {
 }
 
 interface CategoryFormProps {
-  category?: Category
-  onSubmit: (data: Partial<Category>) => void
+  category?: {
+    id?: string
+    name: string
+    slug: string
+    description?: string
+    image_url?: string
+  }
+  onSubmit: (data: any) => void
   onCancel: () => void
   isSubmitting?: boolean
 }
@@ -46,7 +51,6 @@ export function CategoryForm({
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-      {/* Name */}
       <Input
         label="Category Name *"
         placeholder="Enter category name"
@@ -54,7 +58,6 @@ export function CategoryForm({
         {...register('name', { required: 'Category name is required' })}
       />
 
-      {/* Slug */}
       <Input
         label="Slug *"
         placeholder="category-url-slug"
@@ -62,7 +65,6 @@ export function CategoryForm({
         {...register('slug', { required: 'Slug is required' })}
       />
 
-      {/* Description */}
       <div>
         <label className="block text-sm font-medium text-wood-dark mb-2">
           Description *
@@ -83,14 +85,12 @@ export function CategoryForm({
         )}
       </div>
 
-      {/* Image URL */}
       <Input
         label="Image URL"
         placeholder="https://example.com/category-image.jpg"
         {...register('image_url')}
       />
 
-      {/* Actions */}
       <div className="flex items-center justify-end gap-3 pt-4 border-t border-beige-dark">
         <Button type="button" variant="secondary" onClick={onCancel}>
           Cancel

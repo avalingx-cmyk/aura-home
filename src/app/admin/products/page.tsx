@@ -1,25 +1,28 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DataTable, Column } from '@/components/admin/DataTable'
-import { useAdminStore } from '@/lib/store/admin'
-import { Product } from '@/lib/data/mock-data'
+import { useAdminStore, Product } from '@/lib/store/admin'
 import { toast } from '@/lib/store/toast'
 import { cn } from '@/lib/utils'
 
 export default function ProductsPage() {
   const router = useRouter()
-  const { products, categories, deleteProduct } = useAdminStore()
+  const { products, categories, fetchProducts, fetchCategories, deleteProduct, loading } = useAdminStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
 
-  // Filter products
+  useEffect(() => {
+    fetchProducts()
+    fetchCategories()
+  }, [fetchProducts, fetchCategories])
+
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesCategory = !categoryFilter || product.categoryId === categoryFilter
+    const matchesCategory = !categoryFilter || product.category_id === categoryFilter
     return matchesSearch && matchesCategory
   })
 
@@ -27,10 +30,14 @@ export default function ProductsPage() {
     router.push(`/admin/products/${product.id}/edit`)
   }
 
-  const handleDelete = (product: Product) => {
+  const handleDelete = async (product: Product) => {
     if (window.confirm(`Are you sure you want to delete "${product.name}"?`)) {
-      deleteProduct(product.id)
-      toast.success('Product deleted successfully')
+      const success = await deleteProduct(product.id)
+      if (success) {
+        toast.success('Product deleted successfully')
+      } else {
+        toast.error('Failed to delete product')
+      }
     }
   }
 
@@ -60,11 +67,11 @@ export default function ProductsPage() {
       ),
     },
     {
-      key: 'categoryId',
+      key: 'category_id',
       header: 'Category',
       sortable: true,
       render: (product) => {
-        const category = categories.find((c) => c.id === product.categoryId)
+        const category = categories.find((c) => c.id === product.category_id)
         return category ? (
           <span className="px-2 py-1 rounded-full text-xs bg-sage/20 text-forest">
             {category.name}
@@ -81,30 +88,30 @@ export default function ProductsPage() {
       render: (product) => (
         <div>
           <p className="font-medium text-wood-dark">LKR {product.price.toLocaleString()}</p>
-          {product.comparePrice && (
+          {product.compare_price && (
             <p className="text-xs text-wood line-through">
-              LKR {product.comparePrice.toLocaleString()}
+              LKR {product.compare_price.toLocaleString()}
             </p>
           )}
         </div>
       ),
     },
     {
-      key: 'stock',
+      key: 'stock_quantity',
       header: 'Stock',
       sortable: true,
       render: (product) => (
         <span
           className={cn(
             'px-2 py-1 rounded-full text-xs font-medium',
-            (product.stock ?? 0) > 10
+            (product.stock_quantity ?? 0) > 10
               ? 'bg-green-100 text-green-700'
-              : (product.stock ?? 0) > 0
+              : (product.stock_quantity ?? 0) > 0
               ? 'bg-yellow-100 text-yellow-700'
               : 'bg-red-100 text-red-700'
           )}
         >
-          {product.stock ?? 0}
+          {product.stock_quantity ?? 0}
         </span>
       ),
     },
@@ -124,7 +131,6 @@ export default function ProductsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-wood-dark">Products</h1>
@@ -136,7 +142,6 @@ export default function ProductsPage() {
         </Button>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-wood/50" />
@@ -172,14 +177,19 @@ export default function ProductsPage() {
         </select>
       </div>
 
-      {/* Products Table */}
-      <DataTable
-        data={filteredProducts}
-        columns={columns}
-        keyField="id"
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-forest" />
+        </div>
+      ) : (
+        <DataTable
+          data={filteredProducts}
+          columns={columns}
+          keyField="id"
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      )}
     </div>
   )
 }

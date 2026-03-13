@@ -5,36 +5,51 @@ import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CategoryForm } from '@/components/admin/CategoryForm'
-import { useAdminStore } from '@/lib/store/admin'
-import { Category } from '@/lib/data/mock-data'
+import { useAdminStore, Category } from '@/lib/store/admin'
 import { toast } from '@/lib/store/toast'
 
 export default function EditCategoryPage() {
   const router = useRouter()
   const params = useParams()
   const categoryId = params.id as string
-  const { categories, updateCategory } = useAdminStore()
+  const { categories, fetchCategories, updateCategory } = useAdminStore()
   const [category, setCategory] = useState<Category | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const foundCategory = categories.find((c) => c.id === categoryId)
-    if (foundCategory) {
-      setCategory(foundCategory)
-    } else {
-      toast.error('Category not found')
-      router.push('/admin/categories')
+    fetchCategories()
+  }, [fetchCategories])
+
+  useEffect(() => {
+    if (categories.length > 0) {
+      const foundCategory = categories.find((c) => c.id === categoryId)
+      if (foundCategory) {
+        setCategory(foundCategory)
+      } else {
+        toast.error('Category not found')
+        router.push('/admin/categories')
+      }
+      setLoading(false)
     }
-    setLoading(false)
   }, [categoryId, categories, router])
 
-  const handleSubmit = async (data: Partial<Category>) => {
+  const handleSubmit = async (data: any) => {
     setIsSubmitting(true)
     try {
-      updateCategory(categoryId, data)
-      toast.success('Category updated successfully')
-      router.push('/admin/categories')
+      const success = await updateCategory(categoryId, {
+        name: data.name,
+        slug: data.slug,
+        description: data.description,
+        image_url: data.image_url,
+      })
+
+      if (success) {
+        toast.success('Category updated successfully')
+        router.push('/admin/categories')
+      } else {
+        toast.error('Failed to update category')
+      }
     } catch (error) {
       toast.error('Failed to update category')
     } finally {
@@ -56,7 +71,6 @@ export default function EditCategoryPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex items-center gap-4">
         <Button
           variant="secondary"
@@ -71,7 +85,6 @@ export default function EditCategoryPage() {
         </div>
       </div>
 
-      {/* Form Card */}
       <div className="rounded-2xl bg-warm-white border border-beige-dark p-6 shadow-sm">
         <CategoryForm
           category={category}

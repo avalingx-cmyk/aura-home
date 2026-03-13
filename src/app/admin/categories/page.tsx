@@ -1,31 +1,39 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, FolderTree } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DataTable, Column } from '@/components/admin/DataTable'
-import { useAdminStore } from '@/lib/store/admin'
-import { Category } from '@/lib/data/mock-data'
+import { useAdminStore, Category } from '@/lib/store/admin'
 import { toast } from '@/lib/store/toast'
 
 export default function CategoriesPage() {
   const router = useRouter()
-  const { categories, products, deleteCategory } = useAdminStore()
+  const { categories, products, fetchCategories, fetchProducts, deleteCategory, loading } = useAdminStore()
+
+  useEffect(() => {
+    fetchCategories()
+    fetchProducts()
+  }, [fetchCategories, fetchProducts])
 
   const handleEdit = (category: Category) => {
     router.push(`/admin/categories/${category.id}/edit`)
   }
 
-  const handleDelete = (category: Category) => {
-    const productCount = products.filter((p) => p.categoryId === category.id).length
+  const handleDelete = async (category: Category) => {
+    const productCount = products.filter((p) => p.category_id === category.id).length
     if (productCount > 0) {
       toast.error(`Cannot delete category with ${productCount} products. Move or delete products first.`)
       return
     }
     if (window.confirm(`Are you sure you want to delete "${category.name}"?`)) {
-      deleteCategory(category.id)
-      toast.success('Category deleted successfully')
+      const success = await deleteCategory(category.id)
+      if (success) {
+        toast.success('Category deleted successfully')
+      } else {
+        toast.error('Failed to delete category')
+      }
     }
   }
 
@@ -67,7 +75,7 @@ export default function CategoriesPage() {
       key: 'id',
       header: 'Products',
       render: (category) => {
-        const count = products.filter((p) => p.categoryId === category.id).length
+        const count = products.filter((p) => p.category_id === category.id).length
         return (
           <span className="px-2 py-1 rounded-full text-xs bg-beige text-wood-dark">
             {count} {count === 1 ? 'product' : 'products'}
@@ -79,7 +87,6 @@ export default function CategoriesPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-wood-dark">Categories</h1>
@@ -91,14 +98,19 @@ export default function CategoriesPage() {
         </Button>
       </div>
 
-      {/* Categories Table */}
-      <DataTable
-        data={categories}
-        columns={columns}
-        keyField="id"
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-forest" />
+        </div>
+      ) : (
+        <DataTable
+          data={categories}
+          columns={columns}
+          keyField="id"
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      )}
     </div>
   )
 }

@@ -2,6 +2,7 @@
 
 import { Package, FolderTree, ShoppingBag, TrendingUp } from 'lucide-react'
 import { useAdminStore } from '@/lib/store/admin'
+import { useEffect } from 'react'
 
 const statCards = [
   { label: 'Total Products', icon: Package, color: 'bg-forest' },
@@ -11,25 +12,27 @@ const statCards = [
 ]
 
 export default function AdminDashboard() {
-  const { products, categories } = useAdminStore()
+  const { products, categories, fetchProducts, fetchCategories } = useAdminStore()
 
-  // Calculate mock stats
+  useEffect(() => {
+    fetchProducts()
+    fetchCategories()
+  }, [fetchProducts, fetchCategories])
+
   const totalProducts = products.length
   const totalCategories = categories.length
-  const mockOrders = 24 // Placeholder
-  const mockRevenue = 'LKR 125,000' // Placeholder
+  const mockOrders = 24
+  const mockRevenue = 'LKR 125,000'
 
   const stats = [totalProducts, totalCategories, mockOrders, mockRevenue]
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-wood-dark">Dashboard</h1>
         <p className="text-wood">Welcome to Aura Home admin panel</p>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card, index) => {
           const Icon = card.icon
@@ -52,9 +55,7 @@ export default function AdminDashboard() {
         })}
       </div>
 
-      {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Products */}
         <div className="rounded-2xl bg-warm-white border border-beige-dark p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-wood-dark mb-4">Recent Products</h2>
           <div className="space-y-3">
@@ -80,27 +81,26 @@ export default function AdminDashboard() {
                 </div>
                 <span
                   className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    (product.stock ?? 0) > 10
+                    (product.stock_quantity ?? 0) > 10
                       ? 'bg-green-100 text-green-700'
-                      : (product.stock ?? 0) > 0
+                      : (product.stock_quantity ?? 0) > 0
                       ? 'bg-yellow-100 text-yellow-700'
                       : 'bg-red-100 text-red-700'
                   }`}
                 >
-                  {(product.stock ?? 0) > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                  {(product.stock_quantity ?? 0) > 0 ? `${product.stock_quantity} in stock` : 'Out of stock'}
                 </span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Categories Overview */}
         <div className="rounded-2xl bg-warm-white border border-beige-dark p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-wood-dark mb-4">Categories</h2>
           <div className="space-y-3">
             {categories.map((category) => {
               const productCount = products.filter(
-                (p) => p.categoryId === category.id
+                (p) => p.category_id === category.id
               ).length
               return (
                 <div
@@ -129,7 +129,6 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Quick Actions */}
       <div className="rounded-2xl bg-warm-white border border-beige-dark p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-wood-dark mb-4">Quick Actions</h2>
         <div className="flex flex-wrap gap-3">

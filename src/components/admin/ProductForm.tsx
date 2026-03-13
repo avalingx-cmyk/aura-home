@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form'
 import { Package, DollarSign, Hash, Link as LinkIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Category, Product } from '@/lib/data/mock-data'
 import { cn } from '@/lib/utils'
 
 interface ProductFormData {
@@ -19,10 +18,28 @@ interface ProductFormData {
   featured: boolean
 }
 
+interface CategoryOption {
+  id: string
+  name: string
+}
+
+interface ProductData {
+  id?: string
+  name: string
+  slug: string
+  description?: string
+  price: number
+  comparePrice?: number
+  stock?: number
+  categoryId?: string
+  images?: string[]
+  featured?: boolean
+}
+
 interface ProductFormProps {
-  product?: Product
-  categories: Category[]
-  onSubmit: (data: Partial<Product>) => void
+  product?: ProductData
+  categories: CategoryOption[]
+  onSubmit: (data: any) => void
   onCancel: () => void
   isSubmitting?: boolean
 }
@@ -69,11 +86,8 @@ export function ProductForm({
     })
   }
 
-  const nameValue = watch('name')
-
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-      {/* Name */}
       <Input
         label="Product Name *"
         placeholder="Enter product name"
@@ -81,7 +95,6 @@ export function ProductForm({
         {...register('name', { required: 'Product name is required' })}
       />
 
-      {/* Slug */}
       <Input
         label="Slug *"
         placeholder="product-url-slug"
@@ -89,7 +102,6 @@ export function ProductForm({
         {...register('slug', { required: 'Slug is required' })}
       />
 
-      {/* Description */}
       <div>
         <label className="block text-sm font-medium text-wood-dark mb-2">
           Description *
@@ -110,7 +122,6 @@ export function ProductForm({
         )}
       </div>
 
-      {/* Price and Compare Price */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
           <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-wood/50 mt-3" />
@@ -140,7 +151,6 @@ export function ProductForm({
         </div>
       </div>
 
-      {/* Stock and Category */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
           <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-wood/50 mt-3" />
@@ -183,7 +193,6 @@ export function ProductForm({
         </div>
       </div>
 
-      {/* Images */}
       <div>
         <label className="block text-sm font-medium text-wood-dark mb-2">
           Image URLs
@@ -206,7 +215,6 @@ export function ProductForm({
         </p>
       </div>
 
-      {/* Featured */}
       <div className="flex items-center gap-3">
         <input
           type="checkbox"
@@ -223,7 +231,6 @@ export function ProductForm({
         </label>
       </div>
 
-      {/* Actions */}
       <div className="flex items-center justify-end gap-3 pt-4 border-t border-beige-dark">
         <Button type="button" variant="secondary" onClick={onCancel}>
           Cancel

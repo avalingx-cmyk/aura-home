@@ -128,7 +128,7 @@ export function ProductCard({
         size="sm"
         onClick={handleAddToCart}
         disabled={!inStock}
-        variant={addedToCart ? 'default' : 'default'}
+        variant={addedToCart ? 'secondary' : 'primary'}
       >
         {addedToCart ? (
           <>

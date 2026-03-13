@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { ShoppingBag, Truck, Tag, ChevronDown, ChevronUp } from 'lucide-react'
-import { useCartStore } from '@/lib/store/cart'
+import { useCart } from '@/lib/store/cart'
 import { formatPrice } from '@/lib/utils'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
@@ -12,7 +12,7 @@ interface OrderSummaryProps {
 }
 
 export function OrderSummary({ showItems = true }: OrderSummaryProps) {
-  const { items, total, itemCount } = useCartStore()
+  const { items, total, itemCount } = useCart()
   const [showCouponField, setShowCouponField] = useState(false)
   const [couponCode, setCouponCode] = useState('')
   const [isExpanded, setIsExpanded] = useState(true)

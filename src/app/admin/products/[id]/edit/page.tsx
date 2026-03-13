@@ -33,18 +33,10 @@ export default function EditProductPage() {
     setIsSubmitting(true)
     try {
       updateProduct(productId, data)
-      addToast({
-        title: 'Success',
-        message: 'Product updated successfully',
-        type: 'success',
-      })
+      toast.success('Product updated successfully')
       router.push('/admin/products')
     } catch (error) {
-      addToast({
-        title: 'Error',
-        message: 'Failed to update product',
-        type: 'error',
-      })
+      toast.error('Failed to update product')
     } finally {
       setIsSubmitting(false)
     }

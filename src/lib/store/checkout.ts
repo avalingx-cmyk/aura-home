@@ -128,7 +128,7 @@ export const useCheckoutStore = create<CheckoutStore>()(
           const orderId = `AH-${dateStr}-${randomStr}`
 
           // Calculate totals
-          const subtotal = cartState.total
+          const subtotal = cartState.getTotalPrice()
           const shippingCost = subtotal >= 25000 ? 0 : 500
           const total = subtotal + shippingCost
 

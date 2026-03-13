@@ -16,6 +16,8 @@ interface FormErrors {
   email?: string
   address?: string
   city?: string
+  postalCode?: string
+  notes?: string
 }
 
 export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFormProps) {
@@ -72,7 +74,7 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
 
   const handleBlur = (field: keyof ShippingInfo) => {
     setTouched(prev => ({ ...prev, [field]: true }))
-    const error = validateField(field, formData[field])
+    const error = validateField(field, formData[field] ?? '')
     setErrors(prev => ({ ...prev, [field]: error }))
   }
 

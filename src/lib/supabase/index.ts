@@ -11,3 +11,6 @@ export function createServerClient() {
     process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-key'
   )
 }
+
+export { createClient as createBrowserClient } from './client'
+export { createClient as createServerComponentClient } from './server'

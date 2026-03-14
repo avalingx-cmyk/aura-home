@@ -13,6 +13,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const orderId = searchParams.get('id')
   const orderNumber = searchParams.get('order_number')
+  const customerEmail = searchParams.get('customer_email')
 
   // Get single order by ID or order number
   if (orderId || orderNumber) {
@@ -35,11 +36,16 @@ export async function GET(request: Request) {
     return NextResponse.json({ order: data })
   }
 
-  // List orders
-  const { data, error } = await supabaseAdmin
+  // List orders (optionally filtered by customer email)
+  let query = supabaseAdmin
     .from('orders')
     .select('*, items:order_items(*)')
-    .order('created_at', { ascending: false })
+  
+  if (customerEmail) {
+    query = query.eq('shipping_email', customerEmail)
+  }
+  
+  const { data, error } = await query.order('created_at', { ascending: false })
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
@@ -91,6 +97,7 @@ export async function POST(request: Request) {
         payment_status: 'pending',
         shipping_name: shipping.name,
         shipping_phone: shipping.phone,
+        shipping_email: shipping.email,
         shipping_address: shipping.address,
         shipping_city: shipping.city,
         shipping_zone: shipping.zone,

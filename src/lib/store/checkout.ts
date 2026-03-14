@@ -121,20 +121,54 @@ export const useCheckoutStore = create<CheckoutStore>()(
             throw new Error('Shipping information is required')
           }
 
-          // Generate order ID
-          const now = new Date()
-          const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '')
-          const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase()
-          const orderId = `AH-${dateStr}-${randomStr}`
-
           // Calculate totals
           const subtotal = cartState.getTotalPrice()
           const shippingCost = subtotal >= 25000 ? 0 : 500
           const total = subtotal + shippingCost
 
-          // Create order
+          // Prepare order data for API
+          const orderData = {
+            items: cartState.items.map(item => ({
+              product_id: item.productId,
+              name: item.name,
+              price: item.price,
+              salePrice: item.salePrice,
+              image: item.image,
+              quantity: item.quantity,
+            })),
+            shipping: {
+              name: shippingInfo.fullName,
+              phone: shippingInfo.phone,
+              email: shippingInfo.email,
+              address: shippingInfo.address,
+              city: shippingInfo.city,
+              postal_code: shippingInfo.postalCode,
+              zone: 'Colombo', // TODO: Get from delivery zones API
+              delivery_date: undefined, // TODO: Add delivery date selection
+              delivery_time_slot: undefined, // TODO: Add time slot selection
+            },
+            payment_method: paymentMethod,
+            notes: shippingInfo.notes,
+          }
+
+          // Call API to create order
+          const response = await fetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData),
+          })
+
+          if (!response.ok) {
+            const data = await response.json()
+            throw new Error(data.error || 'Failed to create order')
+          }
+
+          const data = await response.json()
+          const orderNumber = data.order.order_number
+
+          // Create local order object for display
           const order: Order = {
-            orderId,
+            orderId: orderNumber,
             items: cartState.items.map(item => ({
               id: item.id,
               productId: item.productId,
@@ -150,21 +184,14 @@ export const useCheckoutStore = create<CheckoutStore>()(
             shippingCost,
             total,
             status: 'pending',
-            createdAt: now.toISOString(),
+            createdAt: new Date().toISOString(),
           }
-
-          // Store order in localStorage
-          const existingOrders: Order[] = JSON.parse(
-            localStorage.getItem('aura-orders') || '[]'
-          )
-          existingOrders.push(order)
-          localStorage.setItem('aura-orders', JSON.stringify(existingOrders))
 
           // Set current order and clear cart
           set({ currentOrder: order, isProcessing: false })
           cartState.clearCart()
 
-          return orderId
+          return orderNumber
         } catch (error) {
           set({ isProcessing: false })
           throw error

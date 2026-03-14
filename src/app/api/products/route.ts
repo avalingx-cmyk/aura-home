@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 
 // GET /api/products - List products
 export async function GET(request: Request) {
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
 
   // Get single product by ID
   if (id) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('products')
       .select('*, category:categories(*)')
       .eq('id', id)
@@ -28,7 +28,7 @@ export async function GET(request: Request) {
 
   // Get single product by slug
   if (slug) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('products')
       .select('*, category:categories(*)')
       .eq('slug', slug)
@@ -43,16 +43,15 @@ export async function GET(request: Request) {
   }
 
   // Build query for list
-  let query = supabase
+  let query = supabaseAdmin
     .from('products')
     .select('*, category:categories(*)', { count: 'exact' })
     .eq('active', true)
-    .order('sort_order')
     .range(offset, offset + limit - 1)
 
   // Filter by category slug
   if (categorySlug) {
-    const { data: cat } = await supabase
+    const { data: cat } = await supabaseAdmin
       .from('categories')
       .select('id')
       .eq('slug', categorySlug)
@@ -99,7 +98,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Name, slug, and price are required' }, { status: 400 })
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('products')
       .insert({
         name,
@@ -165,18 +164,21 @@ export async function PATCH(request: Request) {
     if (featured !== undefined) updateData.featured = featured
     if (active !== undefined) updateData.active = active
 
-    const { data, error } = await supabase
+    const result = await supabaseAdmin
       .from('products')
       .update(updateData)
       .eq('id', id)
       .select()
       .single()
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    if (result.error) {
+      if (result.error.code === 'PGRST116') {
+        return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+      }
+      return NextResponse.json({ error: result.error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ product: data })
+    return NextResponse.json({ product: result.data })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
@@ -193,7 +195,7 @@ export async function DELETE(request: Request) {
     }
 
     // Soft delete by setting active to false
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('products')
       .update({ active: false })
       .eq('id', id)

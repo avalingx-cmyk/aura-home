@@ -1,22 +1,31 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { categories } from '@/lib/data/mock-data'
+import { supabaseAdmin } from '@/lib/supabase'
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export const metadata: Metadata = {
   title: 'Categories | Aura Home',
   description: 'Browse our furniture categories - Living Room, Bedroom, Dining, Office, and more.',
 }
 
-/**
- * Render the categories page with a hero header and a responsive grid of category cards.
- *
- * Each card links to its category detail page and displays the category name, description,
- * and an image (uses `category.image_url` or a fixed Unsplash fallback when missing).
- *
- * @returns A JSX element containing the page header and a responsive grid of linked category cards.
- */
-export default function CategoriesPage() {
+async function getCategories() {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('categories')
+      .select('*')
+    if (error) return []
+    return data || []
+  } catch {
+    return []
+  }
+}
+
+export default async function CategoriesPage() {
+  const categories = await getCategories()
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-warm-white via-beige/30 to-sage/20">
       {/* Header */}
@@ -31,29 +40,35 @@ export default function CategoriesPage() {
 
       {/* Categories Grid */}
       <section className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((category) => (
-            <Link
-              key={category.id}
-              href={`/categories/${category.slug}`}
-              className="group relative overflow-hidden rounded-3xl bg-warm-white shadow-soft hover:shadow-lg transition-shadow"
-            >
-              <div className="relative h-64">
-                <Image
-                  src={category.image_url || 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&auto=format&fit=crop&q=60'}
-                  alt={category.name}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-forest/80 via-forest/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <h2 className="text-2xl font-bold text-white mb-2">{category.name}</h2>
-                  <p className="text-sage/90 text-sm line-clamp-2">{category.description}</p>
+        {categories.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {categories.map((category: any) => (
+              <Link
+                key={category.id}
+                href={`/categories/${category.slug}`}
+                className="group relative overflow-hidden rounded-3xl bg-warm-white shadow-soft hover:shadow-lg transition-shadow"
+              >
+                <div className="relative h-64">
+                  <Image
+                    src={category.image_url || 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&auto=format&fit=crop&q=60'}
+                    alt={category.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-forest/80 via-forest/20 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-6">
+                    <h2 className="text-2xl font-bold text-white mb-2">{category.name}</h2>
+                    <p className="text-sage/90 text-sm line-clamp-2">{category.description}</p>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-wood">No categories available</p>
+          </div>
+        )}
       </section>
     </div>
   )

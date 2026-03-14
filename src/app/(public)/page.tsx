@@ -2,22 +2,44 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Truck, Shield, RefreshCw } from 'lucide-react'
 import { ProductCard } from '@/components/product/product-card'
+import { supabaseAdmin } from '@/lib/supabase'
 
-const featuredProducts = [
-  { id: '1', name: 'Modern Sofa Set', slug: 'modern-sofa-set', price: 85000, comparePrice: 95000, image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400', rating: 4.8, reviewCount: 24 },
-  { id: '2', name: 'Oak Dining Table', slug: 'oak-dining-table', price: 45000, image: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?w=400', rating: 4.6, reviewCount: 18 },
-  { id: '3', name: 'Comfort Armchair', slug: 'comfort-armchair', price: 32000, image: 'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400', rating: 4.9, reviewCount: 32 },
-  { id: '4', name: 'King Size Bed', slug: 'king-size-bed', price: 120000, image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400', rating: 4.7, reviewCount: 15 },
-]
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
-const categories = [
-  { name: 'Living Room', slug: 'living-room', image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300' },
-  { name: 'Bedroom', slug: 'bedroom', image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=300' },
-  { name: 'Dining', slug: 'dining', image: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?w=300' },
-  { name: 'Office', slug: 'office', image: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=300' },
-]
+async function getCategories() {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('categories')
+      .select('*')
+    if (error) return []
+    return data || []
+  } catch {
+    return []
+  }
+}
 
-export default function HomePage() {
+async function getFeaturedProducts() {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('products')
+      .select('*, category:categories(*)')
+      .eq('active', true)
+      .eq('featured', true)
+      .limit(4)
+    if (error) return []
+    return data || []
+  } catch {
+    return []
+  }
+}
+
+export default async function HomePage() {
+  const [categories, featuredProducts] = await Promise.all([
+    getCategories(),
+    getFeaturedProducts()
+  ])
+
   return (
     <div className="flex flex-col">
       {/* Hero */}
@@ -65,15 +87,23 @@ export default function HomePage() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-wood-dark mb-8">Shop by Category</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {categories.map((cat) => (
-              <Link key={cat.slug} href={`/products?category=${cat.slug}`} className="group relative aspect-square rounded-3xl overflow-hidden">
-                <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <h3 className="absolute bottom-4 left-4 text-white font-semibold text-lg">{cat.name}</h3>
-              </Link>
-            ))}
-          </div>
+          {categories.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {categories.slice(0, 4).map((cat: any) => (
+                <Link key={cat.id} href={`/products?category=${cat.slug}`} className="group relative aspect-square rounded-3xl overflow-hidden">
+                  <img 
+                    src={cat.image_url || 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300'} 
+                    alt={cat.name} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <h3 className="absolute bottom-4 left-4 text-white font-semibold text-lg">{cat.name}</h3>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="text-wood">No categories available</p>
+          )}
         </div>
       </section>
 
@@ -84,11 +114,23 @@ export default function HomePage() {
             <h2 className="text-2xl md:text-3xl font-bold text-wood-dark">Featured Products</h2>
             <Link href="/products"><Button variant="ghost">View All <ArrowRight className="ml-2 w-4 h-4" /></Button></Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} {...product} />
-            ))}
-          </div>
+          {featuredProducts.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {featuredProducts.map((product: any) => (
+                <ProductCard 
+                  key={product.id} 
+                  id={product.id}
+                  name={product.name}
+                  slug={product.slug}
+                  price={product.price}
+                  comparePrice={product.compare_price}
+                  image={product.images?.[0] || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400'}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-wood">No featured products available</p>
+          )}
         </div>
       </section>
 

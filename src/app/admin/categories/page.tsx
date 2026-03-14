@@ -10,7 +10,7 @@ import { toast } from '@/lib/store/toast'
 
 export default function CategoriesPage() {
   const router = useRouter()
-  const { categories, products, fetchCategories, fetchProducts, deleteCategory, loading } = useAdminStore()
+  const { categories, products, fetchCategories, fetchProducts, deleteCategory, categoriesLoading } = useAdminStore()
 
   useEffect(() => {
     fetchCategories()
@@ -98,7 +98,7 @@ export default function CategoriesPage() {
         </Button>
       </div>
 
-      {loading ? (
+      {categoriesLoading ? (
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-forest" />
         </div>

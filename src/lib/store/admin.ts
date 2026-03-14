@@ -31,8 +31,10 @@ export interface Category {
 interface AdminState {
   products: Product[]
   categories: Category[]
-  loading: boolean
-  error: string | null
+  productsLoading: boolean
+  categoriesLoading: boolean
+  productsError: string | null
+  categoriesError: string | null
   // Fetch actions
   fetchProducts: () => Promise<void>
   fetchCategories: () => Promise<void>
@@ -49,38 +51,42 @@ interface AdminState {
 export const useAdminStore = create<AdminState>((set, get) => ({
   products: [],
   categories: [],
-  loading: false,
-  error: null,
+  productsLoading: false,
+  categoriesLoading: false,
+  productsError: null,
+  categoriesError: null,
 
   // Fetch products from API
   fetchProducts: async () => {
-    set({ loading: true, error: null })
+    set({ productsLoading: true, productsError: null })
     try {
       const res = await fetch('/api/products')
-      const data = await res.json()
-      if (data.products) {
-        set({ products: data.products, loading: false })
-      } else {
-        set({ error: data.error || 'Failed to fetch products', loading: false })
+      if (!res.ok) {
+        const data = await res.json()
+        set({ productsError: data.error || `Failed to fetch products (${res.status})`, productsLoading: false })
+        return
       }
+      const data = await res.json()
+      set({ products: data.products, productsLoading: false })
     } catch (error: any) {
-      set({ error: error.message, loading: false })
+      set({ productsError: error.message, productsLoading: false })
     }
   },
 
   // Fetch categories from API
   fetchCategories: async () => {
-    set({ loading: true, error: null })
+    set({ categoriesLoading: true, categoriesError: null })
     try {
       const res = await fetch('/api/categories')
-      const data = await res.json()
-      if (data.categories) {
-        set({ categories: data.categories, loading: false })
-      } else {
-        set({ error: data.error || 'Failed to fetch categories', loading: false })
+      if (!res.ok) {
+        const data = await res.json()
+        set({ categoriesError: data.error || `Failed to fetch categories (${res.status})`, categoriesLoading: false })
+        return
       }
+      const data = await res.json()
+      set({ categories: data.categories, categoriesLoading: false })
     } catch (error: any) {
-      set({ error: error.message, loading: false })
+      set({ categoriesError: error.message, categoriesLoading: false })
     }
   },
 
@@ -93,14 +99,14 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         body: JSON.stringify(productData),
       })
       const data = await res.json()
-      if (data.product) {
+      if (res.ok && data.product) {
         set((state) => ({ products: [...state.products, data.product] }))
         return data.product
       }
-      set({ error: data.error || 'Failed to create product' })
+      set({ productsError: data.error || `Failed to create product (${res.status})` })
       return null
     } catch (error: any) {
-      set({ error: error.message })
+      set({ productsError: error.message })
       return null
     }
   },
@@ -114,7 +120,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         body: JSON.stringify(productData),
       })
       const data = await res.json()
-      if (data.product) {
+      if (res.ok && data.product) {
         set((state) => ({
           products: state.products.map((p) =>
             p.id === id ? data.product : p
@@ -122,10 +128,10 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         }))
         return true
       }
-      set({ error: data.error || 'Failed to update product' })
+      set({ productsError: data.error || `Failed to update product (${res.status})` })
       return false
     } catch (error: any) {
-      set({ error: error.message })
+      set({ productsError: error.message })
       return false
     }
   },
@@ -137,16 +143,16 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         method: 'DELETE',
       })
       const data = await res.json()
-      if (data.success) {
+      if (res.ok && data.success) {
         set((state) => ({
           products: state.products.filter((p) => p.id !== id),
         }))
         return true
       }
-      set({ error: data.error || 'Failed to delete product' })
+      set({ productsError: data.error || `Failed to delete product (${res.status})` })
       return false
     } catch (error: any) {
-      set({ error: error.message })
+      set({ productsError: error.message })
       return false
     }
   },
@@ -160,14 +166,14 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         body: JSON.stringify(categoryData),
       })
       const data = await res.json()
-      if (data.category) {
+      if (res.ok && data.category) {
         set((state) => ({ categories: [...state.categories, data.category] }))
         return data.category
       }
-      set({ error: data.error || 'Failed to create category' })
+      set({ categoriesError: data.error || `Failed to create category (${res.status})` })
       return null
     } catch (error: any) {
-      set({ error: error.message })
+      set({ categoriesError: error.message })
       return null
     }
   },
@@ -181,7 +187,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         body: JSON.stringify(categoryData),
       })
       const data = await res.json()
-      if (data.category) {
+      if (res.ok && data.category) {
         set((state) => ({
           categories: state.categories.map((c) =>
             c.id === id ? data.category : c
@@ -189,10 +195,10 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         }))
         return true
       }
-      set({ error: data.error || 'Failed to update category' })
+      set({ categoriesError: data.error || `Failed to update category (${res.status})` })
       return false
     } catch (error: any) {
-      set({ error: error.message })
+      set({ categoriesError: error.message })
       return false
     }
   },
@@ -204,16 +210,16 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         method: 'DELETE',
       })
       const data = await res.json()
-      if (data.success) {
+      if (res.ok && data.success) {
         set((state) => ({
           categories: state.categories.filter((c) => c.id !== id),
         }))
         return true
       }
-      set({ error: data.error || 'Failed to delete category' })
+      set({ categoriesError: data.error || `Failed to delete category (${res.status})` })
       return false
     } catch (error: any) {
-      set({ error: error.message })
+      set({ categoriesError: error.message })
       return false
     }
   },

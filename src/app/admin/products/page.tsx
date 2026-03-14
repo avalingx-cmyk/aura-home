@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 
 export default function ProductsPage() {
   const router = useRouter()
-  const { products, categories, fetchProducts, fetchCategories, deleteProduct, loading } = useAdminStore()
+  const { products, categories, fetchProducts, fetchCategories, deleteProduct, productsLoading } = useAdminStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
 
@@ -177,7 +177,7 @@ export default function ProductsPage() {
         </select>
       </div>
 
-      {loading ? (
+      {productsLoading ? (
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-forest" />
         </div>

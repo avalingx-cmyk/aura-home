@@ -12,7 +12,7 @@ export default function EditCategoryPage() {
   const router = useRouter()
   const params = useParams()
   const categoryId = params.id as string
-  const { categories, fetchCategories, updateCategory } = useAdminStore()
+  const { categories, categoriesLoading: storeLoading, fetchCategories, updateCategory } = useAdminStore()
   const [category, setCategory] = useState<Category | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -22,17 +22,17 @@ export default function EditCategoryPage() {
   }, [fetchCategories])
 
   useEffect(() => {
-    if (categories.length > 0) {
-      const foundCategory = categories.find((c) => c.id === categoryId)
-      if (foundCategory) {
-        setCategory(foundCategory)
-      } else {
-        toast.error('Category not found')
-        router.push('/admin/categories')
-      }
-      setLoading(false)
+    if (storeLoading) return
+    
+    const foundCategory = categories.find((c) => c.id === categoryId)
+    if (foundCategory) {
+      setCategory(foundCategory)
+    } else {
+      toast.error('Category not found')
+      router.push('/admin/categories')
     }
-  }, [categoryId, categories, router])
+    setLoading(false)
+  }, [categoryId, categories, storeLoading, router])
 
   const handleSubmit = async (data: any) => {
     setIsSubmitting(true)

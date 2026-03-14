@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 
 // Generate unique order number
 function generateOrderNumber(): string {
@@ -16,7 +16,7 @@ export async function GET(request: Request) {
 
   // Get single order by ID or order number
   if (orderId || orderNumber) {
-    let query = supabase
+    let query = supabaseAdmin
       .from('orders')
       .select('*, items:order_items(*)')
     
@@ -36,7 +36,7 @@ export async function GET(request: Request) {
   }
 
   // List orders
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('orders')
     .select('*, items:order_items(*)')
     .order('created_at', { ascending: false })
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     // Get delivery zone fee
     let shippingFee = 0
     if (shipping.zone) {
-      const { data: zone } = await supabase
+      const { data: zone } = await supabaseAdmin
         .from('delivery_zones')
         .select('fee')
         .eq('name', shipping.zone)
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
     const orderNumber = generateOrderNumber()
 
     // Create order
-    const { data: order, error: orderError } = await supabase
+    const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
       .insert({
         order_number: orderNumber,
@@ -115,7 +115,7 @@ export async function POST(request: Request) {
       total: parseFloat(item.price) * item.quantity
     }))
 
-    const { error: itemsError } = await supabase
+    const { error: itemsError } = await supabaseAdmin
       .from('order_items')
       .insert(orderItems)
 
@@ -145,7 +145,7 @@ export async function PATCH(request: Request) {
   if (status) updateData.status = status
   if (payment_status) updateData.payment_status = payment_status
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('orders')
     .update(updateData)
     .eq('id', id)

@@ -1,7 +1,21 @@
 'use client'
 
 import { ProductCard } from './product-card'
-import type { Product } from '@/lib/data/mock-data'
+
+export interface Product {
+  id: string
+  name: string
+  slug: string
+  price: number
+  comparePrice?: number
+  images: string[]
+  inStock?: boolean
+  stock?: number
+  featured?: boolean
+  category?: string
+  category_id?: string
+  description?: string
+}
 
 interface ProductGridProps {
   products: Product[]
@@ -43,7 +57,7 @@ export function ProductGrid({ products, emptyMessage = 'No products found' }: Pr
           slug={product.slug}
           price={product.price}
           comparePrice={product.comparePrice}
-          image={product.images[0] || '/placeholder-product.jpg'}
+          image={product.images?.[0] || '/placeholder-product.jpg'}
           rating={4.5}
           reviewCount={0}
           inStock={product.inStock !== false}

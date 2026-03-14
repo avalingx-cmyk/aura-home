@@ -1,28 +1,56 @@
 import { ProductGrid } from '@/components/product'
-import { products, searchProducts } from '@/lib/data/mock-data'
-import { Suspense } from 'react'
+import { supabaseAdmin } from '@/lib/supabase'
 
-interface ProductsPageProps {
-  searchParams: { q?: string }
+async function getProducts(categorySlug?: string) {
+  try {
+    let query = supabaseAdmin
+      .from('products')
+      .select('*, category:categories(*)')
+      .eq('active', true)
+    
+    if (categorySlug) {
+      const { data: cat } = await supabaseAdmin
+        .from('categories')
+        .select('id')
+        .eq('slug', categorySlug)
+        .single()
+      
+      if (cat) {
+        query = query.eq('category_id', cat.id)
+      }
+    }
+    
+    const { data, error } = await query
+    if (error) return []
+    return data || []
+  } catch {
+    return []
+  }
 }
 
-export default function ProductsPage({ searchParams }: ProductsPageProps) {
-  const query = searchParams.q || ''
-  const filteredProducts = query ? searchProducts(query) : products
+interface ProductsPageProps {
+  searchParams: { category?: string }
+}
+
+export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+  const category = searchParams.category
+  const products = await getProducts(category)
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">
-        {query ? `Search results for "${query}"` : 'All Products'}
-      </h1>
-      
-      {filteredProducts.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">No products found for "{query}"</p>
-        </div>
-      ) : (
-        <ProductGrid products={filteredProducts} />
-      )}
+    <div className="min-h-screen bg-gradient-to-br from-warm-white via-beige/30 to-sage/20">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold text-wood-dark mb-8">
+          {category ? `${category.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}` : 'All Products'}
+        </h1>
+        
+        {products.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-wood text-lg">No products available</p>
+          </div>
+        ) : (
+          <ProductGrid products={products} />
+        )}
+      </div>
     </div>
   )
 }

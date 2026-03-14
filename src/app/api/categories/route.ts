@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 
 // GET /api/categories - List categories
 export async function GET(request: Request) {
@@ -9,7 +9,7 @@ export async function GET(request: Request) {
 
   // Get single category by ID
   if (id) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('categories')
       .select('*, products:products(count)')
       .eq('id', id)
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 
   // Get single category by slug
   if (slug) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('categories')
       .select('*, products:products(count)')
       .eq('slug', slug)
@@ -38,10 +38,9 @@ export async function GET(request: Request) {
   }
 
   // List all categories
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('categories')
     .select('*')
-    .order('sort_order')
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
@@ -60,7 +59,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Name and slug are required' }, { status: 400 })
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('categories')
       .insert({
         name,
@@ -100,18 +99,21 @@ export async function PATCH(request: Request) {
     if (description !== undefined) updateData.description = description
     if (image_url !== undefined) updateData.image_url = image_url
 
-    const { data, error } = await supabase
+    const result = await supabaseAdmin
       .from('categories')
       .update(updateData)
       .eq('id', id)
       .select()
       .single()
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    if (result.error) {
+      if (result.error.code === 'PGRST116') {
+        return NextResponse.json({ error: 'Category not found' }, { status: 404 })
+      }
+      return NextResponse.json({ error: result.error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ category: data })
+    return NextResponse.json({ category: result.data })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
@@ -127,13 +129,18 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'Category ID is required' }, { status: 400 })
     }
 
-    const { error } = await supabase
+const result = await supabaseAdmin
       .from('categories')
       .delete()
       .eq('id', id)
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    if (result.error) {
+      if (result.error.code === '23503') {
+        return NextResponse.json({ 
+          error: 'Cannot delete category while products exist. Remove or reassign products first.' 
+        }, { status: 409 })
+      }
+      return NextResponse.json({ error: result.error.message }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })

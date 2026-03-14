@@ -12,7 +12,7 @@ export default function EditProductPage() {
   const router = useRouter()
   const params = useParams()
   const productId = params.id as string
-  const { products, categories, fetchProducts, fetchCategories, updateProduct } = useAdminStore()
+  const { products, categories, fetchProducts, fetchCategories, updateProduct, productsLoading, categoriesLoading } = useAdminStore()
   const [product, setProduct] = useState<Product | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -23,17 +23,17 @@ export default function EditProductPage() {
   }, [fetchProducts, fetchCategories])
 
   useEffect(() => {
-    if (products.length > 0) {
-      const foundProduct = products.find((p) => p.id === productId)
-      if (foundProduct) {
-        setProduct(foundProduct)
-      } else {
-        toast.error('Product not found')
-        router.push('/admin/products')
-      }
-      setLoading(false)
+    if (productsLoading || categoriesLoading) return
+    
+    const foundProduct = products.find((p) => p.id === productId)
+    if (foundProduct) {
+      setProduct(foundProduct)
+    } else {
+      toast.error('Product not found')
+      router.push('/admin/products')
     }
-  }, [productId, products, router])
+    setLoading(false)
+  }, [productId, products, productsLoading, categoriesLoading, router])
 
   const handleSubmit = async (data: any) => {
     setIsSubmitting(true)

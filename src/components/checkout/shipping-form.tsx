@@ -66,6 +66,7 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
     delivery_zone?: string
     delivery_date?: string
     delivery_time_slot?: string
+    whatsappOptIn?: boolean
   }>({
     fullName: initialData?.fullName || '',
     phone: initialData?.phone || '',
@@ -77,6 +78,7 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
     delivery_zone: initialData?.delivery_zone || '',
     delivery_date: initialData?.delivery_date || '',
     delivery_time_slot: initialData?.delivery_time_slot || '',
+    whatsappOptIn: initialData?.whatsappOptIn || false,
   })
   
   const [errors, setErrors] = useState<FormErrors>({})
@@ -194,7 +196,7 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
     const hasErrors = Object.values(newErrors).some(error => error !== undefined)
     if (hasErrors) return
     
-    // Submit with delivery zone info
+    // Submit with delivery zone and WhatsApp opt-in
     onSubmit({
       fullName: formData.fullName,
       phone: formatPhone(formData.phone),
@@ -206,6 +208,7 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
       zone: formData.delivery_zone,
       delivery_date: formData.delivery_date,
       delivery_time_slot: formData.delivery_time_slot,
+      whatsappOptIn: formData.whatsappOptIn === 'true',
     } as ShippingInfo)
   }
 
@@ -449,6 +452,27 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
           className={cn(inputClasses('notes'), "resize-none")}
           disabled={isProcessing}
         />
+      </div>
+
+      {/* WhatsApp Opt-in */}
+      <div>
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={formData.whatsappOptIn || false}
+            onChange={(e) => handleChange('whatsappOptIn', e.target.checked ? 'true' : '')}
+            className="mt-1 h-4 w-4 text-forest-600 border-sage-300 rounded focus:ring-forest-500"
+            disabled={isProcessing}
+          />
+          <div className="text-sm">
+            <span className="font-medium text-wood-900">
+              Get order updates on WhatsApp
+            </span>
+            <p className="text-sage-500">
+              We'll send you order confirmation, shipping updates, and delivery reminders via WhatsApp.
+            </p>
+          </div>
+        </label>
       </div>
 
       {/* Submit Button */}

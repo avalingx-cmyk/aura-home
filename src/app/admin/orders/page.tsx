@@ -116,6 +116,32 @@ export default function OrdersPage() {
         throw new Error(data.error || 'Failed to update order')
       }
       
+      // Send WhatsApp notification
+      try {
+        const whatsappResponse = await fetch('/api/admin/whatsapp/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order_id: orderId, status: newStatus }),
+        })
+        
+        if (whatsappResponse.ok) {
+          const whatsappData = await whatsappResponse.json()
+          
+          // If WhatsApp link returned, offer to open it
+          if (whatsappData.whatsapp_link && !whatsappData.skipped) {
+            const openWhatsApp = confirm(
+              `Order status updated to ${newStatus}.\n\nOpen WhatsApp to send notification to customer?`
+            )
+            if (openWhatsApp) {
+              window.open(whatsappData.whatsapp_link, '_blank')
+            }
+          }
+        }
+      } catch (whatsappError) {
+        console.error('WhatsApp notification failed:', whatsappError)
+        // Continue anyway - WhatsApp is optional
+      }
+      
       // Refresh orders
       await fetchOrders()
       setShowModal(false)

@@ -12,6 +12,7 @@ export interface ShippingInfo {
   zone?: string // Delivery zone name
   delivery_date?: string // ISO date format (YYYY-MM-DD)
   delivery_time_slot?: string // e.g., "9:00 AM - 12:00 PM"
+  whatsappOptIn?: boolean // Opt-in for WhatsApp notifications
 }
 
 export interface OrderItem {
@@ -149,6 +150,7 @@ export const useCheckoutStore = create<CheckoutStore>()(
               zone: shippingInfo.zone,
               delivery_date: shippingInfo.delivery_date,
               delivery_time_slot: shippingInfo.delivery_time_slot,
+              whatsapp_opt_in: shippingInfo.whatsappOptIn,
             },
             payment_method: paymentMethod,
             notes: shippingInfo.notes,

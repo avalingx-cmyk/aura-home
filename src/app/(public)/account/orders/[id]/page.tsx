@@ -52,6 +52,8 @@ export default function OrderDetailPage() {
 
   useEffect(() => {
     const fetchOrder = async () => {
+      if (!params?.id) return
+      
       try {
         const response = await fetch(`/api/orders?id=${params.id}`)
         if (!response.ok) {
@@ -68,7 +70,7 @@ export default function OrderDetailPage() {
     }
 
     fetchOrder()
-  }, [params.id])
+  }, [params?.id])
 
   if (loading) {
     return (

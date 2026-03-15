@@ -103,6 +103,7 @@ export async function POST(request: Request) {
         shipping_zone: shipping.zone,
         delivery_date: shipping.delivery_date,
         delivery_time_slot: shipping.delivery_time_slot,
+        whatsapp_opt_in: shipping.whatsapp_opt_in || false,
         notes
       })
       .select()

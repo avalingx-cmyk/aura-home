@@ -39,6 +39,8 @@ export default function BlogPostPage() {
   const [commentContent, setCommentContent] = useState('')
 
   useEffect(() => {
+    if (!params?.slug) return
+    
     const fetchComments = async () => {
       try {
         const response = await fetch(`/api/comments?post_id=${params.slug}`)
@@ -66,7 +68,7 @@ export default function BlogPostPage() {
 
     fetchPost()
     fetchComments()
-  }, [params.slug])
+  }, [params?.slug])
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault()

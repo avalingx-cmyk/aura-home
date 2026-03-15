@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { Calendar, User, Clock, Tag, Share2, MessageSquare } from 'lucide-react'
-import { NextSeo } from 'next-seo'
+import Head from 'next/head'
 
 interface Post {
   id: string
@@ -15,6 +15,7 @@ interface Post {
   published_at: string
   meta_title?: string
   meta_description?: string
+  meta_keywords?: string
   authors: { email: string }
   categories: Array<{ category: { name: string; slug: string } }>
   tags: Array<{ tag: { name: string; slug: string } }>
@@ -38,6 +39,18 @@ export default function BlogPostPage() {
   const [commentContent, setCommentContent] = useState('')
 
   useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const response = await fetch(`/api/comments?post_id=${params.slug}`)
+        if (response.ok) {
+          const data = await response.json()
+          setComments(data.comments)
+        }
+      } catch (error) {
+        console.error('Error fetching comments:', error)
+      }
+    }
+
     const fetchPost = async () => {
       try {
         const response = await fetch(`/api/blog/${params.slug}?increment=true`)
@@ -48,18 +61,6 @@ export default function BlogPostPage() {
         console.error('Error fetching post:', error)
       } finally {
         setLoading(false)
-      }
-    }
-
-    const fetchComments = async () => {
-      try {
-        const response = await fetch(`/api/comments?post_id=${params.slug}`)
-        if (response.ok) {
-          const data = await response.json()
-          setComments(data.comments)
-        }
-      } catch (error) {
-        console.error('Error fetching comments:', error)
       }
     }
 
@@ -82,7 +83,12 @@ export default function BlogPostPage() {
 
       if (response.ok) {
         setCommentContent('')
-        fetchComments()
+        // Refetch comments
+        const response = await fetch(`/api/comments?post_id=${params.slug}`)
+        if (response.ok) {
+          const data = await response.json()
+          setComments(data.comments)
+        }
         alert('Comment submitted for approval!')
       }
     } catch (error) {
@@ -117,24 +123,17 @@ export default function BlogPostPage() {
   return (
     <>
       {/* SEO */}
-      <NextSeo
-        title={post.meta_title || post.title}
-        description={post.meta_description || post.excerpt}
-        openGraph={{
-          title: post.meta_title || post.title,
-          description: post.meta_description || post.excerpt,
-          images: post.cover_image ? [{ url: post.cover_image }] : [],
-          type: 'article',
-          publishedTime: post.published_at,
-          authors: [post.authors?.email],
-        }}
-        twitter={{
-          cardType: 'summary_large_image',
-        }}
-        additionalMetaTags={[
-          { property: 'keywords', content: post.meta_keywords || '' },
-        ]}
-      />
+      <Head>
+        <title>{post.meta_title || post.title}</title>
+        <meta name="description" content={post.meta_description || post.excerpt} />
+        <meta name="keywords" content={post.meta_keywords || ''} />
+        <meta property="og:title" content={post.meta_title || post.title} />
+        <meta property="og:description" content={post.meta_description || post.excerpt} />
+        <meta property="og:type" content="article" />
+        <meta property="article:published_time" content={post.published_at} />
+        {post.cover_image && <meta property="og:image" content={post.cover_image} />}
+        <meta name="twitter:card" content="summary_large_image" />
+      </Head>
 
       <article className="min-h-screen bg-white">
         {/* Header */}

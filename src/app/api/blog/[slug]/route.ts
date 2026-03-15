@@ -68,7 +68,7 @@ export async function PATCH(
     // Get current post
     const { data: currentPost } = await supabaseAdmin
       .from('posts')
-      .select('id')
+      .select('id, published_at')
       .eq('slug', params.slug)
       .single()
 

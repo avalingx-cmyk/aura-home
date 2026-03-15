@@ -59,8 +59,8 @@ export function AdminSidebar({ collapsed = false, onToggle }: AdminSidebarProps)
       {/* Navigation */}
       <nav className="flex-1 space-y-1 p-2">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || 
-            (item.href !== '/admin' && pathname.startsWith(item.href))
+          const isActive = pathname && (pathname === item.href || 
+            (item.href !== '/admin' && pathname.startsWith(item.href)))
           const Icon = item.icon
 
           return (

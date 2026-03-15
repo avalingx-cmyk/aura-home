@@ -71,12 +71,14 @@ export default function BlogPostPage() {
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    if (!params?.slug || !post?.id) return
+    
     try {
       const response = await fetch('/api/comments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          post_id: post?.id,
+          post_id: post.id,
           content: commentContent,
         }),
       })

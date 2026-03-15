@@ -17,6 +17,8 @@ export default function OrderConfirmationContent() {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
+    if (!searchParams) return
+    
     const orderId = searchParams.get('orderId')
     if (orderId) {
       const foundOrder = getOrderByOrderId(orderId)

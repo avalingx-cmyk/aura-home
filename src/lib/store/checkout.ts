@@ -9,6 +9,9 @@ export interface ShippingInfo {
   city: string
   postalCode?: string
   notes?: string
+  zone?: string // Delivery zone name
+  delivery_date?: string // ISO date format (YYYY-MM-DD)
+  delivery_time_slot?: string // e.g., "9:00 AM - 12:00 PM"
 }
 
 export interface OrderItem {
@@ -143,9 +146,9 @@ export const useCheckoutStore = create<CheckoutStore>()(
               address: shippingInfo.address,
               city: shippingInfo.city,
               postal_code: shippingInfo.postalCode,
-              zone: 'Colombo', // TODO: Get from delivery zones API
-              delivery_date: undefined, // TODO: Add delivery date selection
-              delivery_time_slot: undefined, // TODO: Add time slot selection
+              zone: shippingInfo.zone,
+              delivery_date: shippingInfo.delivery_date,
+              delivery_time_slot: shippingInfo.delivery_time_slot,
             },
             payment_method: paymentMethod,
             notes: shippingInfo.notes,

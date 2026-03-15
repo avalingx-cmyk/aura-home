@@ -62,12 +62,7 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
   const [loadingZones, setLoadingZones] = useState(true)
   const [selectedZone, setSelectedZone] = useState<DeliveryZone | null>(null)
   
-  const [formData, setFormData] = useState<ShippingInfo & {
-    delivery_zone?: string
-    delivery_date?: string
-    delivery_time_slot?: string
-    whatsappOptIn?: boolean
-  }>({
+  const [formData, setFormData] = useState<ShippingInfo>({
     fullName: initialData?.fullName || '',
     phone: initialData?.phone || '',
     email: initialData?.email || '',
@@ -75,7 +70,7 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
     city: initialData?.city || '',
     postalCode: initialData?.postalCode || '',
     notes: initialData?.notes || '',
-    delivery_zone: initialData?.delivery_zone || '',
+    zone: initialData?.zone || '',
     delivery_date: initialData?.delivery_date || '',
     delivery_time_slot: initialData?.delivery_time_slot || '',
     whatsappOptIn: initialData?.whatsappOptIn || false,
@@ -102,15 +97,15 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
     fetchZones()
   }, [])
 
-  // Update selected zone when delivery_zone changes
+  // Update selected zone when zone changes
   useEffect(() => {
-    if (formData.delivery_zone) {
-      const zone = zones.find(z => z.name === formData.delivery_zone)
+    if (formData.zone) {
+      const zone = zones.find(z => z.name === formData.zone)
       setSelectedZone(zone || null)
     } else {
       setSelectedZone(null)
     }
-  }, [formData.delivery_zone, zones])
+  }, [formData.zone, zones])
 
   const validateField = (field: string, value: string): string | undefined => {
     switch (field) {
@@ -137,7 +132,7 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
       case 'city':
         if (!value.trim()) return 'City is required'
         break
-      case 'delivery_zone':
+      case 'zone':
         if (!value.trim()) return 'Please select a delivery zone'
         break
       case 'delivery_date':
@@ -175,7 +170,7 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
       email: validateField('email', formData.email),
       address: validateField('address', formData.address),
       city: validateField('city', formData.city),
-      deliveryZone: validateField('delivery_zone', formData.delivery_zone || ''),
+      zone: validateField('zone', formData.zone || ''),
       deliveryDate: validateField('delivery_date', formData.delivery_date || ''),
       deliveryTimeSlot: validateField('delivery_time_slot', formData.delivery_time_slot || ''),
     }
@@ -187,7 +182,7 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
       email: true,
       address: true,
       city: true,
-      delivery_zone: true,
+      zone: true,
       delivery_date: true,
       delivery_time_slot: true,
     })
@@ -205,7 +200,7 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
       city: formData.city,
       postalCode: formData.postalCode,
       notes: formData.notes,
-      zone: formData.delivery_zone,
+      zone: formData.zone,
       delivery_date: formData.delivery_date,
       delivery_time_slot: formData.delivery_time_slot,
       whatsappOptIn: formData.whatsappOptIn === 'true',
@@ -338,18 +333,18 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
 
       {/* Delivery Zone */}
       <div>
-        <label htmlFor="delivery_zone" className="block text-sm font-medium text-wood-900 mb-2">
+        <label htmlFor="zone" className="block text-sm font-medium text-wood-900 mb-2">
           Delivery Zone <span className="text-red-500">*</span>
         </label>
         {loadingZones ? (
           <div className="text-sm text-sage-500 py-3">Loading zones...</div>
         ) : (
           <select
-            id="delivery_zone"
-            value={formData.delivery_zone || ''}
-            onChange={(e) => handleChange('delivery_zone', e.target.value)}
-            onBlur={() => handleBlur('delivery_zone')}
-            className={cn(inputClasses('delivery_zone'), "cursor-pointer")}
+            id="zone"
+            value={formData.zone || ''}
+            onChange={(e) => handleChange('zone', e.target.value)}
+            onBlur={() => handleBlur('zone')}
+            className={cn(inputClasses('zone'), "cursor-pointer")}
             disabled={isProcessing || loadingZones}
           >
             <option value="">Select your delivery zone</option>
@@ -360,8 +355,8 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
             ))}
           </select>
         )}
-        {errors.deliveryZone && touched.deliveryZone && (
-          <p className="mt-1 text-sm text-red-500">{errors.deliveryZone}</p>
+        {errors.zone && touched.zone && (
+          <p className="mt-1 text-sm text-red-500">{errors.zone}</p>
         )}
         {selectedZone && (
           <p className="mt-2 text-sm text-forest-600">

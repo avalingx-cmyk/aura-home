@@ -22,7 +22,7 @@ export function BottomTabs() {
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-warm-white border-t border-beige md:hidden">
       <div className="flex items-center justify-around py-2">
         {navItems.map(({ href, icon: Icon, label }) => {
-          const isActive = pathname === href
+          const isActive = pathname && pathname === href
           const showBadge = label === 'Cart' && itemCount > 0
 
           return (

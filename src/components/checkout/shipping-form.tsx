@@ -107,7 +107,7 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
     }
   }, [formData.zone, zones])
 
-  const validateField = (field: string, value: string): string | undefined => {
+  const validateField = (field: keyof ShippingInfo, value: string): string | undefined => {
     switch (field) {
       case 'fullName':
         if (!value.trim()) return 'Full name is required'
@@ -145,18 +145,19 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
     return undefined
   }
 
-  const handleChange = (field: string, value: string) => {
+  const handleChange = (field: keyof ShippingInfo, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     
     if (touched[field]) {
-      const error = validateField(field, value)
+      const error = validateField(field, String(value))
       setErrors(prev => ({ ...prev, [field]: error }))
     }
   }
 
-  const handleBlur = (field: string) => {
+  const handleBlur = (field: keyof ShippingInfo) => {
     setTouched(prev => ({ ...prev, [field]: true }))
-    const error = validateField(field, formData[field as keyof typeof formData] ?? '')
+    const value = formData[field]
+    const error = validateField(field, typeof value === 'boolean' ? String(value) : (value ?? ''))
     setErrors(prev => ({ ...prev, [field]: error }))
   }
 
@@ -203,7 +204,7 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
       zone: formData.zone,
       delivery_date: formData.delivery_date,
       delivery_time_slot: formData.delivery_time_slot,
-      whatsappOptIn: formData.whatsappOptIn === 'true',
+      whatsappOptIn: formData.whatsappOptIn || false,
     } as ShippingInfo)
   }
 
@@ -455,7 +456,7 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
           <input
             type="checkbox"
             checked={formData.whatsappOptIn || false}
-            onChange={(e) => handleChange('whatsappOptIn', e.target.checked ? 'true' : '')}
+            onChange={(e) => handleChange('whatsappOptIn', e.target.checked)}
             className="mt-1 h-4 w-4 text-forest-600 border-sage-300 rounded focus:ring-forest-500"
             disabled={isProcessing}
           />

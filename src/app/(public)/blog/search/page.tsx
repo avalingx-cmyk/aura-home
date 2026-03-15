@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Search, Calendar, User, Clock, ChevronRight } from 'lucide-react'
+import { Search, Calendar, Clock, ChevronRight } from 'lucide-react'
 
 interface Post {
   id: string
@@ -17,7 +17,7 @@ interface Post {
   views: number
 }
 
-export default function BlogSearchPage() {
+function BlogSearchContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [query, setQuery] = useState('')
@@ -26,7 +26,9 @@ export default function BlogSearchPage() {
   const [total, setTotal] = useState(0)
 
   useEffect(() => {
-    const searchQuery = searchParams?.get('q') || ''
+    if (!searchParams) return
+    
+    const searchQuery = searchParams.get('q') || ''
     setQuery(searchQuery)
 
     if (searchQuery) {
@@ -193,5 +195,17 @@ export default function BlogSearchPage() {
         )}
       </main>
     </div>
+  )
+}
+
+export default function BlogSearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-wood">Loading search...</p>
+      </div>
+    }>
+      <BlogSearchContent />
+    </Suspense>
   )
 }

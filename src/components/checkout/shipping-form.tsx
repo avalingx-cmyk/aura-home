@@ -18,9 +18,9 @@ interface FormErrors {
   city?: string
   postalCode?: string
   notes?: string
-  deliveryZone?: string
-  deliveryDate?: string
-  deliveryTimeSlot?: string
+  zone?: string
+  delivery_date?: string
+  delivery_time_slot?: string
 }
 
 interface DeliveryZone {
@@ -172,8 +172,8 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
       address: validateField('address', formData.address),
       city: validateField('city', formData.city),
       zone: validateField('zone', formData.zone || ''),
-      deliveryDate: validateField('delivery_date', formData.delivery_date || ''),
-      deliveryTimeSlot: validateField('delivery_time_slot', formData.delivery_time_slot || ''),
+      delivery_date: validateField('delivery_date', formData.delivery_date || ''),
+      delivery_time_slot: validateField('delivery_time_slot', formData.delivery_time_slot || ''),
     }
     
     setErrors(newErrors)
@@ -186,7 +186,7 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
       zone: true,
       delivery_date: true,
       delivery_time_slot: true,
-    })
+    } as Record<keyof ShippingInfo, boolean>)
     
     // Check if there are any errors
     const hasErrors = Object.values(newErrors).some(error => error !== undefined)
@@ -387,8 +387,8 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
             </option>
           ))}
         </select>
-        {errors.deliveryDate && touched.deliveryDate && (
-          <p className="mt-1 text-sm text-red-500">{errors.deliveryDate}</p>
+        {errors.delivery_date && touched.delivery_date && (
+          <p className="mt-1 text-sm text-red-500">{errors.delivery_date}</p>
         )}
       </div>
 
@@ -412,8 +412,8 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
             </option>
           ))}
         </select>
-        {errors.deliveryTimeSlot && touched.deliveryTimeSlot && (
-          <p className="mt-1 text-sm text-red-500">{errors.deliveryTimeSlot}</p>
+        {errors.delivery_time_slot && touched.delivery_time_slot && (
+          <p className="mt-1 text-sm text-red-500">{errors.delivery_time_slot}</p>
         )}
       </div>
 

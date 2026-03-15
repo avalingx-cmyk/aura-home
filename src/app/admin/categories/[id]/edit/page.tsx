@@ -11,7 +11,7 @@ import { toast } from '@/lib/store/toast'
 export default function EditCategoryPage() {
   const router = useRouter()
   const params = useParams()
-  const categoryId = params.id as string
+  const categoryId = params?.id as string
   const { categories, categoriesLoading: storeLoading, fetchCategories, updateCategory } = useAdminStore()
   const [category, setCategory] = useState<Category | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)

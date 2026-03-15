@@ -11,7 +11,7 @@ import { toast } from '@/lib/store/toast'
 export default function EditProductPage() {
   const router = useRouter()
   const params = useParams()
-  const productId = params.id as string
+  const productId = params?.id as string
   const { products, categories, fetchProducts, fetchCategories, updateProduct, productsLoading, categoriesLoading } = useAdminStore()
   const [product, setProduct] = useState<Product | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)

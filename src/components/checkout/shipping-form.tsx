@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ShippingInfo, isValidSriLankanPhone, SRI_LANKAN_CITIES, formatPhone } from '@/lib/store/checkout'
 import { cn } from '@/lib/utils'
 
@@ -18,10 +18,55 @@ interface FormErrors {
   city?: string
   postalCode?: string
   notes?: string
+  deliveryZone?: string
+  deliveryDate?: string
+  deliveryTimeSlot?: string
+}
+
+interface DeliveryZone {
+  id: string
+  name: string
+  fee: number
+  estimated_days: number
+  active: boolean
+}
+
+const DELIVERY_TIME_SLOTS = [
+  '9:00 AM - 12:00 PM',
+  '12:00 PM - 3:00 PM',
+  '3:00 PM - 6:00 PM',
+  '6:00 PM - 9:00 PM',
+]
+
+// Generate next 7 days for delivery
+const getAvailableDates = () => {
+  const dates = []
+  const today = new Date()
+  for (let i = 1; i <= 7; i++) {
+    const date = new Date(today)
+    date.setDate(today.getDate() + i)
+    dates.push({
+      value: date.toISOString().split('T')[0],
+      label: date.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+      }),
+    })
+  }
+  return dates
 }
 
 export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFormProps) {
-  const [formData, setFormData] = useState<ShippingInfo>({
+  const [zones, setZones] = useState<DeliveryZone[]>([])
+  const [loadingZones, setLoadingZones] = useState(true)
+  const [selectedZone, setSelectedZone] = useState<DeliveryZone | null>(null)
+  
+  const [formData, setFormData] = useState<ShippingInfo & {
+    delivery_zone?: string
+    delivery_date?: string
+    delivery_time_slot?: string
+  }>({
     fullName: initialData?.fullName || '',
     phone: initialData?.phone || '',
     email: initialData?.email || '',
@@ -29,10 +74,41 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
     city: initialData?.city || '',
     postalCode: initialData?.postalCode || '',
     notes: initialData?.notes || '',
+    delivery_zone: initialData?.delivery_zone || '',
+    delivery_date: initialData?.delivery_date || '',
+    delivery_time_slot: initialData?.delivery_time_slot || '',
   })
   
   const [errors, setErrors] = useState<FormErrors>({})
   const [touched, setTouched] = useState<Record<string, boolean>>({})
+
+  // Fetch delivery zones on mount
+  useEffect(() => {
+    const fetchZones = async () => {
+      try {
+        const response = await fetch('/api/delivery-zones')
+        if (response.ok) {
+          const data = await response.json()
+          setZones(data.zones || [])
+        }
+      } catch (error) {
+        console.error('Error fetching delivery zones:', error)
+      } finally {
+        setLoadingZones(false)
+      }
+    }
+    fetchZones()
+  }, [])
+
+  // Update selected zone when delivery_zone changes
+  useEffect(() => {
+    if (formData.delivery_zone) {
+      const zone = zones.find(z => z.name === formData.delivery_zone)
+      setSelectedZone(zone || null)
+    } else {
+      setSelectedZone(null)
+    }
+  }, [formData.delivery_zone, zones])
 
   const validateField = (field: string, value: string): string | undefined => {
     switch (field) {
@@ -59,11 +135,20 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
       case 'city':
         if (!value.trim()) return 'City is required'
         break
+      case 'delivery_zone':
+        if (!value.trim()) return 'Please select a delivery zone'
+        break
+      case 'delivery_date':
+        if (!value.trim()) return 'Please select a delivery date'
+        break
+      case 'delivery_time_slot':
+        if (!value.trim()) return 'Please select a time slot'
+        break
     }
     return undefined
   }
 
-  const handleChange = (field: keyof ShippingInfo, value: string) => {
+  const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     
     if (touched[field]) {
@@ -72,9 +157,9 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
     }
   }
 
-  const handleBlur = (field: keyof ShippingInfo) => {
+  const handleBlur = (field: string) => {
     setTouched(prev => ({ ...prev, [field]: true }))
-    const error = validateField(field, formData[field] ?? '')
+    const error = validateField(field, formData[field as keyof typeof formData] ?? '')
     setErrors(prev => ({ ...prev, [field]: error }))
   }
 
@@ -88,6 +173,9 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
       email: validateField('email', formData.email),
       address: validateField('address', formData.address),
       city: validateField('city', formData.city),
+      deliveryZone: validateField('delivery_zone', formData.delivery_zone || ''),
+      deliveryDate: validateField('delivery_date', formData.delivery_date || ''),
+      deliveryTimeSlot: validateField('delivery_time_slot', formData.delivery_time_slot || ''),
     }
     
     setErrors(newErrors)
@@ -97,27 +185,40 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
       email: true,
       address: true,
       city: true,
+      delivery_zone: true,
+      delivery_date: true,
+      delivery_time_slot: true,
     })
     
     // Check if there are any errors
     const hasErrors = Object.values(newErrors).some(error => error !== undefined)
     if (hasErrors) return
     
-    // Format phone number before submitting
+    // Submit with delivery zone info
     onSubmit({
-      ...formData,
+      fullName: formData.fullName,
       phone: formatPhone(formData.phone),
-    })
+      email: formData.email,
+      address: formData.address,
+      city: formData.city,
+      postalCode: formData.postalCode,
+      notes: formData.notes,
+      zone: formData.delivery_zone,
+      delivery_date: formData.delivery_date,
+      delivery_time_slot: formData.delivery_time_slot,
+    } as ShippingInfo)
   }
 
-  const inputClasses = (field: keyof ShippingInfo) =>
+  const inputClasses = (field: string) =>
     cn(
       "w-full px-4 py-3 rounded-lg border transition-colors",
       "focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-transparent",
-      errors[field] && touched[field]
+      errors[field as keyof FormErrors] && touched[field]
         ? "border-red-300 bg-red-50"
         : "border-sage-200 bg-white hover:border-sage-300"
     )
+
+  const availableDates = getAvailableDates()
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -229,6 +330,91 @@ export function ShippingForm({ initialData, onSubmit, isProcessing }: ShippingFo
         </select>
         {errors.city && touched.city && (
           <p className="mt-1 text-sm text-red-500">{errors.city}</p>
+        )}
+      </div>
+
+      {/* Delivery Zone */}
+      <div>
+        <label htmlFor="delivery_zone" className="block text-sm font-medium text-wood-900 mb-2">
+          Delivery Zone <span className="text-red-500">*</span>
+        </label>
+        {loadingZones ? (
+          <div className="text-sm text-sage-500 py-3">Loading zones...</div>
+        ) : (
+          <select
+            id="delivery_zone"
+            value={formData.delivery_zone || ''}
+            onChange={(e) => handleChange('delivery_zone', e.target.value)}
+            onBlur={() => handleBlur('delivery_zone')}
+            className={cn(inputClasses('delivery_zone'), "cursor-pointer")}
+            disabled={isProcessing || loadingZones}
+          >
+            <option value="">Select your delivery zone</option>
+            {zones.map((zone) => (
+              <option key={zone.id} value={zone.name}>
+                {zone.name} - LKR {zone.fee.toLocaleString()} ({zone.estimated_days} day{zone.estimated_days > 1 ? 's' : ''})
+              </option>
+            ))}
+          </select>
+        )}
+        {errors.deliveryZone && touched.deliveryZone && (
+          <p className="mt-1 text-sm text-red-500">{errors.deliveryZone}</p>
+        )}
+        {selectedZone && (
+          <p className="mt-2 text-sm text-forest-600">
+            Delivery fee: <strong>LKR {selectedZone.fee.toLocaleString()}</strong> • 
+            Estimated: <strong>{selectedZone.estimated_days} day{selectedZone.estimated_days > 1 ? 's' : ''}</strong>
+          </p>
+        )}
+      </div>
+
+      {/* Delivery Date */}
+      <div>
+        <label htmlFor="delivery_date" className="block text-sm font-medium text-wood-900 mb-2">
+          Delivery Date <span className="text-red-500">*</span>
+        </label>
+        <select
+          id="delivery_date"
+          value={formData.delivery_date || ''}
+          onChange={(e) => handleChange('delivery_date', e.target.value)}
+          onBlur={() => handleBlur('delivery_date')}
+          className={cn(inputClasses('delivery_date'), "cursor-pointer")}
+          disabled={isProcessing}
+        >
+          <option value="">Select delivery date</option>
+          {availableDates.map((date) => (
+            <option key={date.value} value={date.value}>
+              {date.label}
+            </option>
+          ))}
+        </select>
+        {errors.deliveryDate && touched.deliveryDate && (
+          <p className="mt-1 text-sm text-red-500">{errors.deliveryDate}</p>
+        )}
+      </div>
+
+      {/* Delivery Time Slot */}
+      <div>
+        <label htmlFor="delivery_time_slot" className="block text-sm font-medium text-wood-900 mb-2">
+          Delivery Time Slot <span className="text-red-500">*</span>
+        </label>
+        <select
+          id="delivery_time_slot"
+          value={formData.delivery_time_slot || ''}
+          onChange={(e) => handleChange('delivery_time_slot', e.target.value)}
+          onBlur={() => handleBlur('delivery_time_slot')}
+          className={cn(inputClasses('delivery_time_slot'), "cursor-pointer")}
+          disabled={isProcessing}
+        >
+          <option value="">Select time slot</option>
+          {DELIVERY_TIME_SLOTS.map((slot) => (
+            <option key={slot} value={slot}>
+              {slot}
+            </option>
+          ))}
+        </select>
+        {errors.deliveryTimeSlot && touched.deliveryTimeSlot && (
+          <p className="mt-1 text-sm text-red-500">{errors.deliveryTimeSlot}</p>
         )}
       </div>
 

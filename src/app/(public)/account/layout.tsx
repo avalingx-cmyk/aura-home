@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { User, ShoppingBag, LogOut, Loader2 } from 'lucide-react'
+import { User, ShoppingBag, Heart, LogOut, Loader2 } from 'lucide-react'
 import { getCurrentUser, signOut } from '@/lib/auth'
 import { cn } from '@/lib/utils'
 
@@ -14,7 +14,6 @@ export default function AccountLayout({ children }: AccountLayoutProps) {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'overview' | 'orders' | 'profile'>('overview')
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -70,36 +69,40 @@ export default function AccountLayout({ children }: AccountLayoutProps) {
           <aside className="md:col-span-1">
             <nav className="space-y-2">
               <button
-                onClick={() => setActiveTab('overview')}
+                onClick={() => router.push('/account')}
                 className={cn(
                   'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left',
-                  activeTab === 'overview'
-                    ? 'bg-wood text-white'
-                    : 'bg-white text-wood hover:bg-beige/50'
+                  'bg-white text-wood hover:bg-beige/50'
                 )}
               >
                 <User className="h-5 w-5" />
                 <span className="font-medium">Overview</span>
               </button>
               <button
-                onClick={() => setActiveTab('orders')}
+                onClick={() => router.push('/account/orders')}
                 className={cn(
                   'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left',
-                  activeTab === 'orders'
-                    ? 'bg-wood text-white'
-                    : 'bg-white text-wood hover:bg-beige/50'
+                  'bg-white text-wood hover:bg-beige/50'
                 )}
               >
                 <ShoppingBag className="h-5 w-5" />
                 <span className="font-medium">Orders</span>
               </button>
               <button
-                onClick={() => setActiveTab('profile')}
+                onClick={() => router.push('/account/wishlist')}
                 className={cn(
                   'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left',
-                  activeTab === 'profile'
-                    ? 'bg-wood text-white'
-                    : 'bg-white text-wood hover:bg-beige/50'
+                  'bg-white text-wood hover:bg-beige/50'
+                )}
+              >
+                <Heart className="h-5 w-5" />
+                <span className="font-medium">Wishlist</span>
+              </button>
+              <button
+                onClick={() => router.push('/account/profile')}
+                className={cn(
+                  'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left',
+                  'bg-white text-wood hover:bg-beige/50'
                 )}
               >
                 <User className="h-5 w-5" />
